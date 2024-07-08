@@ -10,7 +10,7 @@ routes.get('/getTeacher',getTeacher)
 routes.get('/getStudentbyId',getStudentbyId)
 routes.get('/evaluateYear',evaluateYearStudent)
 routes.get('/yearTypeComment',submitYearTypeComment)
-// routes.get('/eval/form',submitForm)
-// routes.post('/termTypeComment',submitTermTypeComment)
+routes.post('/eval/form',submitForm)
+routes.post('/termTypeComment',submitTermTypeComment)
 
 module.exports=routes

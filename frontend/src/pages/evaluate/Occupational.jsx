@@ -181,9 +181,9 @@ const Occupational = () => {
     // const year = "2023"
 
     useEffect(async () => {
-        console.log(term,currTerm)
-        console.log(year,currYear)
-        console.log(section,currSection)
+        console.log(term, currTerm)
+        console.log(year, currYear)
+        console.log(section, currSection)
         const id = localStorage.getItem("studentId")
         console.log(id)
         const data = await axios.get("http://localhost:4000/teacher/evaluate/questions", {
@@ -269,14 +269,15 @@ const Occupational = () => {
         };
         // console.log('Submitting data:', submissionData);
         const id = localStorage.getItem("studentId")
-        await axios.post("http://localhost:4000/eval/form", {
+        await axios.post("http://localhost:4000/teacher/eval/form", {
+            type: "occupationalQA",
+            id: id,
+            section: section,
+            year: year,
+            term: term,
+            data: submissionData,
+        }, {
             headers: {
-                type: "occupationalQA",
-                id: id,
-                section: section,
-                year: year,
-                term: term,
-                data: submissionData,
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             }
@@ -288,27 +289,27 @@ const Occupational = () => {
                 console.log(err.response)
             })
 
-            axios.get("http://localhost:4000/teacher/evaluate", {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    section: section,
-                    year: year,
-                    term: term,
-                    id: id,
-                    type: "occupationalQA"
-                }
-            })
-            .then((res)=>{
+        axios.get("http://localhost:4000/teacher/evaluate", {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                section: section,
+                year: year,
+                term: term,
+                id: id,
+                type: "occupationalQA"
+            }
+        })
+            .then((res) => {
                 console.log(res.data)
                 const per = res.data.result
-                setPercent(per.toFixed(2))
+                setPercent(per)
             })
-            .catch((err)=>{
+            .catch((err) => {
                 console.log(err)
             })
 
-            const commentsElements = document.getElementsByName("comments");
+        const commentsElements = document.getElementsByName("comments");
         commentsElements.forEach((element) => {
             element.disabled = false;
         });
@@ -324,16 +325,18 @@ const Occupational = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post("http://localhost:4000/eval/termTypeComment", {
+        axios.post("http://localhost:4000/teacher/termTypeComment", {
+            section: section,
+            year: year,
+            term: term,
+            id: id,
+            type: "occupationalQA",
+            comments: comments
+        }, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
-                section: section,
-                year: year,
-                term: term,
-                id: id,
-                type: "occupationalQA",
-                comments: comments
+
             }
         })
             .then((res) => {
@@ -413,7 +416,7 @@ const Occupational = () => {
                     Add Question
                 </button>
                 <div className={classes.buttonContainer1}>
-                    <label className={classes.label}>{"Percentage : " + percent+"%"}</label>
+                    <label className={classes.label}>{"Percentage : " + percent + "%"}</label>
                     <button className={classes.button} onClick={handleEvaluate}>Evaluate</button>
                 </div>
             </div>

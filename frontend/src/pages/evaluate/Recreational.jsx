@@ -279,14 +279,15 @@ const Recreational = () => {
         };
         // console.log('Submitting data:', submissionData);
         const id = localStorage.getItem("studentId")
-        await axios.post("http://localhost:4000/eval/form", {
+        await axios.post("http://localhost:4000/teacher/eval/form", {
+            type: "recreationalQA",
+            id: id,
+            section: section,
+            year: year,
+            term: term,
+            data: submissionData,
+        }, {
             headers: {
-                type: "recreationalQA",
-                id: id,
-                section: section,
-                year: year,
-                term: term,
-                data: submissionData,
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             }
@@ -313,7 +314,7 @@ const Recreational = () => {
                 console.log(res.data)
                 const result = {
                     mode: res.data.result.mode,
-                    percent: res.data.result.percent.toFixed(2)
+                    percent: res.data.result.percent
                 }
                 setResult(result)
             })
@@ -337,16 +338,18 @@ const Recreational = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post("http://localhost:4000/eval/termTypeComment", {
+        axios.post("http://localhost:4000/teacher/termTypeComment", {
+            section: section,
+            year: year,
+            term: term,
+            id: id,
+            type: "recreationalQA",
+            comments: comments
+        }, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
-                section: section,
-                year: year,
-                term: term,
-                id: id,
-                type: "recreationalQA",
-                comments: comments
+
             }
         })
             .then((res) => {

@@ -105,28 +105,25 @@ const Front = () => {
   })
 
   const handleSubmit = async () => {
-    await axios.post("http://localhost:4000/eval/termTypeComment", {
+    await axios.post("http://localhost:4000/teacher/termTypeComment", {
+      id: id,
+      section: section,
+      year: year,
+      term: term,
+      type: 'termComment',
+      comments: comments,
+    }, {
       headers: {
-        id: id,
-        section: section,
-        year: year,
-        term: term,
-        type:'termComment',
-        comments:comments,
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       }
     })
-    .then(res=>{
-      console.log(res.data)
-    })
-    .catch(err=>{
-      console.log(err.response)
-    })
-  }
-
-  const handleDisable = () => {
-
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(err => {
+        console.log(err.response)
+      })
   }
 
   const handleCommentsChange = (event) => {

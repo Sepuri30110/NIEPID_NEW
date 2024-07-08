@@ -9,11 +9,7 @@ const teacherSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    teacherMNo: { type: Number },
-    password: {
-        type: String,
-        required: true
-    },
+    teacherMNo: { type: String },
     email: {
         type: String,
         required: true,

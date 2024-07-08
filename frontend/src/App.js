@@ -12,6 +12,7 @@ import Student from "./pages/Student";
 import StudentEval from "./pages/StudentEval";
 import ViewTeachers from "./pages/ViewTeachers";
 import ViewStudents from "./pages/ViewStudents";
+import PrincipalViewStudents from "./pages/PrincipalViewStudents";
 import Front from "./pages/evaluate/Front";
 import History from "./pages/History";
 import Personal from "./pages/evaluate/Personal";
@@ -20,6 +21,7 @@ import Recreational from "./pages/evaluate/Recreational";
 import Occupational from "./pages/evaluate/Occupational";
 import Academic from "./pages/evaluate/Academic";
 import Term from "./pages/Term";
+import TermEntry from "./pages/TermEntry";
 
 
 import "react-toastify/dist/ReactToastify.css";
@@ -66,11 +68,13 @@ export default function App() {
             <Route exact path="/teacher/eval/recreational" element={<Recreational />} />
             <Route exact path="/teacher/eval/academic" element={<Academic />} />
             <Route exact path="/teacher/term" element={<Term />} />
+            <Route exact path="/teacher/termEntry" element={<TermEntry/>}/>
 
           </Route>
           <Route element={<PrinciplePrivateRoute />}>
             <Route exact path="/principle" element={<Principle />} />
-
+            <Route exact path="/principle/viewteachers" element={<ViewTeachers />} />
+            <Route exact path="/principle/viewstudents" element={<PrincipalViewStudents />} />
           </Route>
 
         </Route>

@@ -6,6 +6,7 @@ const studentModel = require('../models/student.model')
 const studentDetailsModel = require('../models/studentDetails.model')
 const classModel = require('../models/class.model')
 const deriveHistory = require('../deriving/deriveHistory')
+const findQAs = require('../deriving/deriveQAs')
 
 
 const jwt = require('jsonwebtoken')
@@ -105,25 +106,74 @@ const evaluateStudent = async (req, res) => {
             questions = termReport.report.recreationalQA
         else if (req.headers.type === "occupationalQA")
             questions = termReport.report.occupationalQA
-        
+
         let result
         // console.log(questions)
         if (req.headers.type !== "recreationalQA") {
             result = findPercent(questions)
-            if (req.headers.type === "personalQA")
+            if (req.headers.type === "personalQA") {
                 termReport.percent.personalPercent = result
-            else if (req.headers.type === "socialQA")
+                termReport.evaluated.personal = true
+            }
+            else if (req.headers.type === "socialQA") {
                 termReport.percent.socialPercent = result
-            else if (req.headers.type === "academicQA")
+                termReport.evaluated.social = true
+            }
+            else if (req.headers.type === "academicQA") {
                 termReport.percent.academicPercent = result
-            else if (req.headers.type === "occupationalQA")
-                termReport.percent.occupationalPercent = result
+                termReport.evaluated.academic = true
+            }
+            else if (req.headers.type === "occupationalQA") {
+                termReport.percent.occupationalComment = result
+                termReport.evaluated.occupational = true
+            }
         }
         else {
             result = findPercentForRecreational(questions)
             termReport.percent.recreationalPercent = result.percent
             termReport.percent.mode = result.mode
+            termReport.evaluated.recreational = true
         }
+
+        let newTermReport = {
+            evaluated: {
+                personal: false,
+                academic: false,
+                social: false,
+                occupational: false,
+                recreational: false
+            },
+            term: '',
+            report: findQAs(req.headers.section),
+            percent: {//Term Performance
+                personalPercent: 0,
+                socialPercent: 0,
+                academicPercent: 0,
+                occupationalPercent: 0,
+                recreationalPercent: 0,
+                mode: ""
+            },
+            comment: {//Term Comments
+                termComment: "",
+                personalComment: "",
+                occupationalComment: "",
+                recreationalComment: "",
+                academicComment: "",
+                socialComment: ""
+            }
+        }
+        if (termReport.evaluated.academic && termReport.evaluated.occupational && termReport.evaluated.personal && termReport.evaluated.recreational && termReport.evaluated.social) {
+            if (termReport.term === 'Entry')
+                newTermReport.term = 'I'
+            else if (termReport.term === 'I')
+                newTermReport.term = "II"
+            else if (termReport.term === 'II')
+                newTermReport.term = "III"
+            else
+                newTermReport.term = "III"//need to change
+        }
+
+        yearReport.termReport.push(newTermReport)
         student.save()
         res.status(200).json({ result })
     }
@@ -145,7 +195,7 @@ const findPercent = (arr) => {
     }
     // console.log(ans,count)
     if (ans != 0 && count != 0)
-        return ((ans / count) * 100)
+        return ((ans / count) * 100).toFixed(2)
     return 0;
 }
 
@@ -178,7 +228,7 @@ const findPercentForRecreational = (arr) => {
     score = (val / arr.length) * 100
     return {
         mode: ans,
-        percent: score
+        percent: score.toFixed(2)
     }
 }
 
@@ -282,21 +332,21 @@ const getTeacher = async (req, res) => {
 
 const submitForm = async (req, res) => {
     try {
-        // console.log(req.body.headers)
-        const id = req.body.headers.id
-        const type = req.body.headers.type
-        const data = req.body.headers.data
-        // const year = req.body.headers.year
-        // const section = req.body.headers.section
-        // const term = req.body.headers.term
+        // console.log(req.body)
+        const id = req.body.id
+        const type = req.body.type
+        const data = req.body.data
+        // const year = req.body.year
+        // const section = req.body.section
+        // const term = req.body.term
         // console.log(data)
         const std = await studentModel.findOne({
             regNo: id,
         })
 
-        const section = std.section.find(sec => sec.sec === req.body.headers.section)
-        const yearReport = section.yearReport.find(report => report.year === req.body.headers.year)
-        const termReport = yearReport.termReport.find(report => report.term === req.body.headers.term)
+        const section = std.section.find(sec => sec.sec === req.body.section)
+        const yearReport = section.yearReport.find(report => report.year === req.body.year)
+        const termReport = yearReport.termReport.find(report => report.term === req.body.term)
 
         if (type === "personalQA")
             termReport.report.personalQA = data.questions
@@ -380,27 +430,26 @@ const getStudentbyId = async (req, res) => {
 
 const submitTermTypeComment = async (req, res) => {
     try {
-        const id = req.body.headers.id
-        // console.log(req.body.headers)
+        const id = req.body.id
+        // console.log(req.body)
         const student = await studentModel.findOne({ regNo: id })
-        const section = student.section.find(sec => sec.sec === req.body.headers.section)
-        const yearReport = section.yearReport.find(year => year.year === req.body.headers.year)
-        const termReport = yearReport.termReport.find(term => term.term === req.body.headers.term)
+        const section = student.section.find(sec => sec.sec === req.body.section)
+        const yearReport = section.yearReport.find(year => year.year === req.body.year)
+        const termReport = yearReport.termReport.find(term => term.term === req.body.term)
 
-        if (req.body.headers.type === "personalQA")
-            termReport.comment.personalComment = req.body.headers.comments
-        else if (req.body.headers.type === "socialQA")
-            termReport.comment.socialComment = req.body.headers.comments
-        else if (req.body.headers.type === "academicQA")
-            termReport.comment.academicComment = req.body.headers.comments
-        else if (req.body.headers.type === "recreationalQA")
-            termReport.comment.recreationalComment = req.body.headers.comments
-        else if (req.body.headers.type === "occupationalQA")
-            termReport.comment.occupationalComment = req.body.headers.comments
-        else
-        {
+        if (req.body.type === "personalQA")
+            termReport.comment.personalComment = req.body.comments
+        else if (req.body.type === "socialQA")
+            termReport.comment.socialComment = req.body.comments
+        else if (req.body.type === "academicQA")
+            termReport.comment.academicComment = req.body.comments
+        else if (req.body.type === "recreationalQA")
+            termReport.comment.recreationalComment = req.body.comments
+        else if (req.body.type === "occupationalQA")
+            termReport.comment.occupationalComment = req.body.comments
+        else {
             console.log("-------")
-            termReport.comment.termComment = req.body.headers.comments
+            termReport.comment.termComment = req.body.comments
         }
 
         console.log(termReport.comment.termComment)

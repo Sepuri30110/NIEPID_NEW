@@ -269,14 +269,16 @@ const Social = () => {
         };
         // console.log('Submitting data:', submissionData);
         const id = localStorage.getItem("studentId")
-        await axios.post("http://localhost:4000/eval/form", {
+        await axios.post("http://localhost:4000/teacher/eval/form", {
+            type: "socialQA",
+            id: id,
+            section: section,
+            year: year,
+            term: term,
+            data: submissionData,
+        }, {
             headers: {
-                type: "socialQA",
-                id: id,
-                section: section,
-                year: year,
-                term: term,
-                data: submissionData,
+
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             }
@@ -302,7 +304,7 @@ const Social = () => {
             .then((res) => {
                 console.log(res.data)
                 const per = res.data.result
-                setPercent(per.toFixed(2))
+                setPercent(per)
             })
             .catch((err) => {
                 console.log(err)
@@ -323,16 +325,17 @@ const Social = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post("http://localhost:4000/eval/termTypeComment", {
+        axios.post("http://localhost:4000/teacher/termTypeComment", {
+            section: section,
+            year: year,
+            term: term,
+            id: id,
+            type: "socialQA",
+            comments: comments
+        }, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
-                section: section,
-                year: year,
-                term: term,
-                id: id,
-                type: "socialQA",
-                comments: comments
             }
         })
             .then((res) => {

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');   
+const mongoose = require('mongoose');
 
 const StudentReport = new mongoose.Schema({
     regNo: {
@@ -22,141 +22,203 @@ const StudentReport = new mongoose.Schema({
         enum: ["Entry", "I", "II", "III"],
         default: "Entry"//added
     },
-    currSection:{
+    currSection: {
         type: String,
         required: true,
     },
-    classId:{
-        type:String,
+    classId: {
+        type: String,
+        required : true
     },
     section: [{
-        sec:{
+        status: {
+            type: String,
+            enum: ['pass', 'fail','promote','ongoing']
+            default : "fail"
+        },
+        sec: {
             type: String,
             required: true,
-            enum:['preprimary','primary']
+            enum: ['preprimary', 'primary']
         },
-        yearReport: [{  
+        yearReport: [{
             year: {
                 type: String,//changed from Number
                 required: true,
                 enum: ["1", "2", "3"]
+                default: "1"
             },
             termReport: [{
+                evaluated: {
+                    personal: {
+                        type: Boolean,
+                        default: false
+                    },
+                    academic: {
+                        type: Boolean,
+                        default: false
+                    },
+                    social: {
+                        type: Boolean,
+                        default: false
+                    },
+                    occupational: {
+                        type: Boolean,
+                        default: false
+                    },
+                    recreational: {
+                        type: Boolean,
+                        default: false
+                    },
+                },
                 term: {
                     type: String,//changed from Number
                     required: true,
                     enum: ["Entry", "I", "II", "III"]
+                    default: "Entry"
                 },
                 report: {//Questions
                     personalQA: [{
                         question: String,
                         answer: {
                             type: String,
-                            enum: ["","Yes", "No", "NA", "NE", "C-P1", "C-P2"]
+                            enum: ["", "Yes", "No", "NA", "NE", "C-P1", "C-P2"]
                         }
                     }],
                     socialQA: [{
                         question: String,
                         answer: {
                             type: String,
-                            enum: ["","Yes", "No", "NA", "NE", "C-P1", "C-P2"]
+                            enum: ["", "Yes", "No", "NA", "NE", "C-P1", "C-P2"]
                         }
                     }],
                     academicQA: [{
                         question: String,
                         answer: {
                             type: String,
-                            enum: ["","Yes", "No", "NA", "NE", "C-P1", "C-P2"]
+                            enum: ["", "Yes", "No", "NA", "NE", "C-P1", "C-P2"]
                         }
                     }],
                     occupationalQA: [{
                         question: String,
                         answer: {
                             type: String,
-                            enum: ["","Yes", "No", "NA", "NE", "C-P1", "C-P2"]
+                            enum: ["", "Yes", "No", "NA", "NE", "C-P1", "C-P2"]
                         }
                     }],
                     recreationalQA: [{
                         question: String,
                         answer: {
                             type: String,
-                            enum: ["","A", "B", "C", "D", "E"]
+                            enum: ["", "A", "B", "C", "D", "E"]
                         }
                     }],
                 },
                 percent: {//Term Performance
-                    personalPercent: Number,
-                    socialPercent: Number,
-                    academicPercent: Number,
-                    occupationalPercent: Number,
-                    recreationalPercent: Number,
+                    personalPercent: {
+                        type : Number,
+                        default : null
+                    },
+                    socialPercent: {
+                        type : Number,
+                        default : null
+                    },
+                    academicPercent: {
+                        type : Number,
+                        default : null
+                    },
+                    occupationalPercent: {
+                        type : Number,
+                        default : null
+                    },
+                    recreationalPercent: {
+                        type : Number,
+                        default : null
+                    },
                     mode: {
                         type: String,
-                        enum: ["","A", "B", "C", "D", "E"]
+                        enum: ["", "A", "B", "C", "D", "E"]
+                        default : ""
                     },
                 },
                 comment: {//Term Comments
                     termComment: {
-                        type: String,
-                        default:""
+                        type : String,
+                        default : ""
                     },
                     personalComment: {
-                        type: String,
-                        default:""
+                        type : String,
+                        default : ""
                     },
                     occupationalComment: {
-                        type: String,
-                        default:""
+                        type : String,
+                        default : ""
                     },
                     recreationalComment: {
-                        type: String,
-                        default:""
+                        type : String,
+                        default : ""
                     },
                     academicComment: {
-                        type: String,
-                        default:""
+                        type : String,
+                        default : ""
                     },
                     socialComment: {
-                        type: String,
-                        default:""
-                    }
+                        type : String,
+                        default : ""
+                    },
                 }
             }],
             comment: {//Year Comments
                 yearComment: {
                     type: String,
-                    default:""
+                    default: ""
                 },
                 yearPersonalComment: {
                     type: String,
-                    default:""
+                    default: ""
                 },
                 yearOccupationalComment: {
                     type: String,
-                    default:""
+                    default: ""
                 },
                 yearRecreationalComment: {
                     type: String,
-                    default:""
+                    default: ""
                 },
                 yearAcademicComment: {
                     type: String,
-                    default:""
+                    default: ""
                 },
                 yearSocialComment: {
                     type: String,
-                    default:""
+                    default: ""
                 },
             },
             percent: {//Year Performance
-                personalPercent: Number,
-                socialPercent: Number,
-                academicPercent: Number,
-                occupationalPercent: Number,
-                recreationalPercent: Number,
+                personalPercent: {
+                    type: Number,
+                    default: null
+                },
+                socialPercent: {
+                    type: Number,
+                    default: null
+                },
+                academicPercent: {
+                    type: Number,
+                    default: null
+                },
+                occupationalPercent: {
+                    type: Number,
+                    default: null
+                },
+                recreationalPercent: {
+                    type: Number,
+                    default: null
+                },
                 mode: {
                     type: String,
-                    enum: ["","A", "B", "C", "D", "E"]
+                    enum: ["", "A", "B", "C", "D", "E"]
+                    default: ""
                 },
             },
         }]

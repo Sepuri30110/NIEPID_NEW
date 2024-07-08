@@ -31,27 +31,13 @@ function App() {
 
             const formData = new FormData();
             formData.append('file', selectedFile);
-
-            let response;
-            if (isTeacher) {
-                response = await axios.post('http://localhost:4000/addteachers', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    withCredentials: true,
-                });
-            } else {
-                formData.append('term', term);
-                formData.append('year', year);
-                formData.append('group', group);
-
-                response = await axios.post('http://localhost:4000/addstudents', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    withCredentials: true,
-                });
-            }
+            console.log(formData)
+            let response = await axios.post('http://localhost:4000/admin/registerTeacher', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+            })
 
             if (response) {
                 navigate('/admin');
@@ -63,11 +49,12 @@ function App() {
         }
     };
 
+
     const handleDownloadTeachers = async () => {
         try {
             console.log("Attempting to download file");
             console.log(`Bearer ${localStorage.getItem("token")}`);
-    
+
             const response = await axios.get('http://localhost:4000/admin/download', {
                 headers: {
                     "Content-Type": "application/json",
@@ -76,7 +63,7 @@ function App() {
                 responseType: 'blob', // Important
                 maxRedirects: 0, // Do not follow redirects
             });
-    
+
             // Check if the response status is 200 OK
             if (response.status === 200) {
                 // Create a URL for the file
@@ -178,7 +165,7 @@ function App() {
                                 />
                             </div>
                             <div style={styles.buttonWrapper}>
-                                <button type="submit" style={styles.button}>
+                                <button onClick={handleUpload} type="submit" style={styles.button}>
                                     Register
                                 </button>
                                 <p style={styles.buttonDescription}>Upload and register new teachers.</p>

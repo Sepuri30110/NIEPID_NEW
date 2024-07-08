@@ -11,7 +11,6 @@ app.use(cors())
  const teacherRoutes=require('./routes/teacher.route')
  const loginRoutes=require('./routes/login.route')
  const principleRoutes=require('./routes/principal.route')
- const additionalRoutes = require('./routes/additional.route')
  const {verifyToken,isAdmin,isStudent,isTeacher,isPrinciple}=require('./middlewares/authorization')
 
 //mongDB connection
@@ -31,7 +30,6 @@ app.use('/student',verifyToken,isStudent,studentRoutes)
 app.use('/teacher',verifyToken,isTeacher,teacherRoutes)
 app.use('/principle',verifyToken,isPrinciple,principleRoutes)
 app.use('/admin',verifyToken,isAdmin,adminRoutes)
-app.use('/eval',additionalRoutes)
 
 app.get('/',(req,res)=>{
     res.status(200).send("hello page")

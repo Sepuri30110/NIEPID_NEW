@@ -2,7 +2,7 @@ const findQAs = (v1) => {
     const ans = {
         personalQA: [{}],
         socialQA: [{}],
-        academincQA: [{}],
+        academicQA: [{}],
         occupationalQA: [{}],
         recreationalQA: [{}],
     }
@@ -48,7 +48,7 @@ const findQAs = (v1) => {
         { question: "Asks for desired objects using gestures/alongwith vocalizations", answer: "" },
         { question: "Tells him name when asked", answer: "" },
         { question: "Gestures/says suitably for Namaste/salam/good morning", answer: "" }]
-        ans.academincQA = [
+        ans.academicQA = [
             { question: "Points/shows body parts (head, nose, cycs, cars, hands, legs) when requested.", answer: "" },
             { question: "Names body parts when pointed to", answer: "" },
             { question: "Paints to 10 comman objects with which he has to interact in his/her home environment (eg.rice, dall, chapati, light, fan, mat, table, chair, shirt/frock, shorts/pants,etc.), when asked or when he wants", answer: "" },

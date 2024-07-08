@@ -283,7 +283,7 @@ const initialDevelopmentHistory = {
 
 const initialStdCred = {
     section: '',
-    year: '',
+    year: '1',
 };
 
 function AddStudents() {
@@ -428,10 +428,10 @@ function AddStudents() {
                     {
                         withCredentials: true
                     })
-                    .then(()=>{
+                    .then(() => {
 
                     })
-                    .catch(err=>{
+                    .catch(err => {
                         console.log(err.response)
                     })
                 console.log("success");
@@ -2525,8 +2525,7 @@ function AddStudents() {
                 >
                     <option value="">Select Section</option>
                     <option value="preprimary">preprimary</option>
-                    <option value="primary_I">primary_I</option>
-                    <option value="primary_II">primary_II</option>
+                    <option value="primary">primary</option>
                 </select>
             </label>
             <label className={classes.label}>
@@ -2537,10 +2536,7 @@ function AddStudents() {
                     onChange={handleChange}
                     className={classes.textInput}
                 >
-                    <option value="">Select Year</option>
                     <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
                 </select>
             </label>
 

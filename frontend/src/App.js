@@ -68,7 +68,7 @@ export default function App() {
             <Route exact path="/teacher/eval/recreational" element={<Recreational />} />
             <Route exact path="/teacher/eval/academic" element={<Academic />} />
             <Route exact path="/teacher/term" element={<Term />} />
-            <Route exact path="/teacher/termEntry" element={<TermEntry/>}/>
+            <Route exact path="/teacher/term/termEntry" element={<TermEntry/>}/>
 
           </Route>
           <Route element={<PrinciplePrivateRoute />}>

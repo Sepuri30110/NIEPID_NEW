@@ -38,32 +38,45 @@ const registerStudent = async (req, res) => {
     try {
         const val1 = {}
         const data = req.body
-        const arr1 = await studentDetailsModel.find({ regNo: data.details.regNo })
-        const arr2 = await studentModel.find({ regNo: data.details.regNo })
-        lable1: if (arr1.length == 0 && arr2.length == 0) {
-            const flag = false
-            const responce1 = await new studentDetailsModel(data.details).save()
-                .then(() => { console.log("data entered in studentDetailsModel successfully") })
+        console.log(data.formData.details.info.regNo)
+        console.log(data.formData.details.info)
+        const arr1 = await studentDetailsModel.find({'info.regNo':data.formData.details.info.regNo})
+        const arr2 = await studentModel.find({regNo:data.formData.details.info.regNo})
+        console.log("hello")
+        console.log(arr1.length)
+        console.log(arr1+"  "+arr2+" "+"hello")
+        lable1: if ((arr1 == null && arr2 == null)||(arr1.length == 0&& arr2==null )||(arr2.length == 0&& arr1 == null)||(arr1.length == 0&& arr2.length == 0)){
+            let flag = false
+            console.log('namaste')
+            console.log(data.formData.details)
+            if(data.formData.details.info.regNo)
+            {
+            const responce1 = await new studentDetailsModel(data.formData.details).save()
+                .then(() => {
+                    console.log("data entered in studentDetailsModel successfully")
+                })
                 .catch((err) => {
-                    console.log("error occured " + err)
+                    console.log(err)
                     flag = true
                 })
+            }
             if (flag) {
-                res.status(400).find({ reason: "studentDetails already exists" })
+                res.status(405).json({ reason: "studentDetails already exists" })
                 break lable1
             }
-            const value1 = generateClassId(data.stdCred.section, data.stdCred.year)
+            const value1 = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
             console.log(value1)
-            const arr3 = await classModel.find({ classId: "preprimary_1" })
-            console.log(arr3.length)
-            console.log(arr3)
-            if (arr3.length == 0) {
-                res.status(400).json({ reason: "no class exists" })
+            const arr3 = await classModel.findOne({ classId: value1 })
+            // console.log(arr3.length)
+            // console.log(arr3)
+            if (!arr3) {
+                res.status(404).json({ reason: "no class exists" })
                 break lable1
-            } else if (arr3.length == 1) {
-                const v1 = arr3[0].student
-                v1.push(data.details.regNo)
-                const searchClass = generateClassId(data.stdCred.section, data.stdCred.year)
+            } else{
+                const v1 = arr3.student
+                v1.push(data.formData.details.info.regNo)
+                // console.log(v1)
+                const searchClass = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
                 const responce2 = await classModel.findOneAndUpdate(
                     { classId: searchClass },
                     { student: v1 },
@@ -72,37 +85,41 @@ const registerStudent = async (req, res) => {
                 const ans = studentJsonGenerate(data, searchClass)
                 console.log(ans)
                 const responce3 = await new studentModel(ans).save()
-                    .then(() => { console.log("student has been saved") })
+                    .then(() => {
+                        console.log("student has been saved")
+                    })
                     .catch((err) => {
-                        console.log("student has not been saved \n" + err)
+                        console.log("student has not been saved \n"+err)
                         flag = true
                         console.log(ans)
                     })
                 if (flag) {
-                    res.status(400).find({ reason: "student already exists" })
+                    res.status(403).json({ reason: "student already exists" })
                     break lable1
                 }
                 const stdUser = {
-                    id: data.details.regNo,
-                    password: details.regNo,
+                    id: data.formData.details.info.regNo,
+                    password: data.formData.details.info.regNo,
                     role: "student"
                 }
                 const responce4 = await new userModel(stdUser).save()
-                    .then(() => { console.log("student has been saved in userDB") })
+                    .then(() => {
+                        console.log("student has been saved in userDB")
+                    })
                     .catch((err) => {
-                        console.log("student has not been saved in userDB \n" + err)
+                        console.log("student has not been saved in userDB \n"+err)
                         flag = true
                         console.log(ans)
                     })
                 if (flag) {
-                    res.status(400).find({ reason: "student already exists" })
+                    res.status(402).json({ reason: "student already exists" })
                     break lable1
                 }
             }
         }
         else {
-            console.log("hi ")
-            res.status(400).json({ failure: "true" })
+            console.log("hi")
+            res.status(401).json({ failure: "true" })
         }
     }
     catch (error) {

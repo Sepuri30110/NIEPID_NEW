@@ -33,8 +33,8 @@ const StudentReport = new mongoose.Schema({
     section: [{
         status: {
             type: String,
-            enum: ['pass', 'fail','promote','ongoing']
-            default : "fail"
+            enum: ['pass','promote','ongoing'],
+            default : "ongoing"
         },
         sec: {
             type: String,
@@ -45,7 +45,7 @@ const StudentReport = new mongoose.Schema({
             year: {
                 type: String,//changed from Number
                 required: true,
-                enum: ["1", "2", "3"]
+                enum: ["1", "2", "3"],
                 default: "1"
             },
             termReport: [{
@@ -74,7 +74,7 @@ const StudentReport = new mongoose.Schema({
                 term: {
                     type: String,//changed from Number
                     required: true,
-                    enum: ["Entry", "I", "II", "III"]
+                    enum: ["Entry", "I", "II", "III"],
                     default: "Entry"
                 },
                 report: {//Questions
@@ -137,7 +137,7 @@ const StudentReport = new mongoose.Schema({
                     },
                     mode: {
                         type: String,
-                        enum: ["", "A", "B", "C", "D", "E"]
+                        enum: ["", "A", "B", "C", "D", "E"],
                         default : ""
                     },
                 },
@@ -217,7 +217,7 @@ const StudentReport = new mongoose.Schema({
                 },
                 mode: {
                     type: String,
-                    enum: ["", "A", "B", "C", "D", "E"]
+                    enum: ["", "A", "B", "C", "D", "E"],
                     default: ""
                 },
             },

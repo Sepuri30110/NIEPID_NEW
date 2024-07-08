@@ -9,8 +9,8 @@ routes.get('/evaluate/questions',getQuestions)
 routes.get('/getTeacher',getTeacher)
 routes.get('/getStudentbyId',getStudentbyId)
 routes.get('/evaluateYear',evaluateYearStudent)
-routes.get('/yearTypeComment',submitYearTypeComment)
 routes.post('/eval/form',submitForm)
 routes.post('/termTypeComment',submitTermTypeComment)
+routes.post('/yearTypeComment',submitYearTypeComment)
 
 module.exports=routes

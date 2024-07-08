@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import image from './th.jpeg';
 import axios from 'axios';
 
-const TermEntry = () => {
+const Front = () => {
     const navigate = useNavigate();
 
     const id = localStorage.getItem("studentId");
@@ -12,10 +12,7 @@ const TermEntry = () => {
 
     const [oldComments, setOldComments] = useState(["", "", "", "", "", ""]);
     const [comments, setComments] = useState(["", "", "", "", "", ""]);
-    const [term1Evaluated, setTerm1Evaluated] = useState(false);
-    const [term2Evaluated, setTerm2Evaluated] = useState(false);
-    const [term3Evaluated, setTerm3Evaluated] = useState(false);
-    const [term4Evaluated, setTerm4Evaluated] = useState(false);
+    const [terms, setTerms] = useState([]);
 
     const [evaluationComplete, setEvaluationComplete] = useState(false);
 
@@ -30,7 +27,7 @@ const TermEntry = () => {
                 <span style={styles.logoLabel}>NIEPID</span>
             </div>
             <nav style={styles.navLinks}>
-                <button onClick={() => navigateTo('/teacher')} style={styles.backButton}>
+                <button onClick={() => navigateTo('/teacher/term')} style={styles.backButton}>
                     Back
                 </button>
             </nav>
@@ -40,53 +37,79 @@ const TermEntry = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get("http://localhost:4000/teacher/evaluate/questions", {
+                const res = await axios.get("http://localhost:4000/teacher/getStudentbyId", {
                     headers: {
                         id: id,
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
-                    withCredentials: true
                 });
-                const data = res.data.data;
+                const data = res.data;
+                // console.log(res)
                 const sectionData = data.section.find(s => s.sec === section);
                 const yearData = sectionData.yearReport.find(y => y.year === year);
 
-                setTerm1Evaluated(!!yearData.termReport.find(t => t.term === "term1"));
-                setTerm2Evaluated(!!yearData.termReport.find(t => t.term === "term2"));
-                setTerm3Evaluated(!!yearData.termReport.find(t => t.term === "term3"));
-                setTerm4Evaluated(!!yearData.termReport.find(t => t.term === "term4"));
+                if (yearData.termReport.length == 4)
+                    if (yearData.termReport[3].evaluated.personal)
+                        if (yearData.termReport[3].evaluated.social)
+                            if (yearData.termReport[3].evaluated.academic)
+                                if (yearData.termReport[3].evaluated.occupational)
+                                    if (yearData.termReport[3].evaluated.recreational)
+                                        setEvaluationComplete(true);
 
-                if (term1Evaluated && term2Evaluated && term3Evaluated && term4Evaluated) {
-                    setEvaluationComplete(true);
-                }
 
-                yearData.termReport.forEach(term => {
-                    if (term.comment.termComment.trim() !== "") {
+                // yearData.termReport.forEach(term => {
+                //     if (term.comment.termComment.trim() !== "") {
+                //         const newOldComments = [...oldComments];
+                //         newOldComments[term.term - 1] = term.comment.termComment;
+                //         setOldComments(newOldComments);
+                //     }
+                // });
+
+                let index = 0
+                yearData.termReport.map(year => {
+                    if (year.comment.termComment.trim() !== "") {
                         const newOldComments = [...oldComments];
-                        newOldComments[term.term - 1] = term.comment.termComment;
-                        setOldComments(newOldComments);
+                        newOldComments[index] = year.comment.termComment;
+                        setOldComments(newOldComments)
                     }
-                });
+                })
+
+                // console.log(yearData.termReport.length)
+
+                const t = []
+                yearData.termReport.map(term => {
+                    t.push(term.term)
+                })
+                console.log(t)
+                setTerms(t)
             } catch (err) {
                 console.log(err);
             }
         };
         fetchData();
-    }, [id, section, year, term1Evaluated, term2Evaluated, term3Evaluated, term4Evaluated]);
+    }, [id, section, year]);
+
+    const saveTerm = (val) => {
+        localStorage.setItem("term", val)
+    }
 
     const handleSubmit = async () => {
         try {
-            await axios.post("http://localhost:4000/eval/termTypeComment", {
+            await axios.post("http://localhost:4000/teacher/yearTypeComment", {
+                id: id,
+                section: section,
+                year: year,
+                comments: comments
+            }, {
                 headers: {
-                    id: id,
-                    section: section,
-                    year: year,
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
-                data: { comments }
-            });
+            })
+                .then(res => {
+                    console.log(res.data)
+                })
         } catch (err) {
             console.log(err.response);
         }
@@ -106,13 +129,18 @@ const TermEntry = () => {
                 <h1 style={styles.heading}>Functional Assessment Checklist for Programming</h1>
                 <h1 style={styles.subHeading}>{section.toUpperCase()} -- Year {year}</h1>
                 <div style={styles.buttonContainer}>
-                    <button style={styles.button} onClick={() => navigate(`/teacher/eval`)}>Term 1</button>
-                    <button style={styles.button} onClick={() => navigate(`/teacher/eval`)}>Term 2</button>
-                    <button style={styles.button} onClick={() => navigate(`/teacher/eval`)}>Term 3</button>
-                    <button style={styles.button} onClick={() => navigate(`/teacher/eval`)}>Term 4</button>
+                    {
+                        terms.map(term => (
+                            <button key={term} onClick={() => {
+                                localStorage.setItem("term", term)
+                                navigate('/teacher/eval')
+                            }} style={styles.termButton}>Term{term}</button>
+                        ))
+                    }
                 </div>
             </main>
 
+            <label>Enter your comments for year</label>
             <textarea
                 name="comments1"
                 value={comments[0]}
@@ -122,6 +150,7 @@ const TermEntry = () => {
                 disabled={!evaluationComplete}
             />
 
+            <label>Enter your comments for personal</label>
             <textarea
                 name="comments2"
                 value={comments[1]}
@@ -131,6 +160,7 @@ const TermEntry = () => {
                 disabled={!evaluationComplete}
             />
 
+            <label>Enter your comments for occupational</label>
             <textarea
                 name="comments3"
                 value={comments[2]}
@@ -140,6 +170,7 @@ const TermEntry = () => {
                 disabled={!evaluationComplete}
             />
 
+            <label>Enter your comments for academic</label>
             <textarea
                 name="comments4"
                 value={comments[3]}
@@ -149,6 +180,7 @@ const TermEntry = () => {
                 disabled={!evaluationComplete}
             />
 
+            <label>Enter your comments for social</label>
             <textarea
                 name="comments5"
                 value={comments[4]}
@@ -158,6 +190,7 @@ const TermEntry = () => {
                 disabled={!evaluationComplete}
             />
 
+            <label>Enter your comments for recreational</label>
             <textarea
                 name="comments6"
                 value={comments[5]}
@@ -212,6 +245,15 @@ const styles = {
         flex: '1',
         padding: '2rem',
         textAlign: 'center',
+    },
+    termButton: {
+        padding: '0.8rem 1.5rem',
+        fontSize: '1rem',
+        backgroundColor: '#007bff',
+        color: '#ffffff',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
     },
     heading: {
         fontSize: '28px',
@@ -284,4 +326,4 @@ const styles = {
     },
 };
 
-export default TermEntry;
+export default Front;

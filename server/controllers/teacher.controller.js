@@ -12,32 +12,26 @@ const findQAs = require('../deriving/deriveQAs')
 const jwt = require('jsonwebtoken')
 
 const submitYearTypeComment = async (req, res) => {
-    try {
-        const id = req.headers.id
-        const student = await studentModel.findOne({ regNo: id })
-        const section = student.section.find(sec => sec.sec === req.headers.section)
-        const yearReport = section.yearReport.find(year => year.year === req.headers.year)
+    // try {
+    const id = req.body.id
+    const student = await studentModel.findOne({ regNo: id })
+    const section = student.section.find(sec => sec.sec === req.body.section)
+    const yearReport = section.yearReport.find(year => year.year === req.body.year)
+    // console.log(req.body)
+    yearReport.comment.yearComment = req.body.comments[0]
+    yearReport.comment.yearPersonalComment = req.body.comments[1]
+    yearReport.comment.yearOccupationalComment = req.body.comments[2]
+    yearReport.comment.yearAcademicComment = req.body.comments[3]
+    yearReport.comment.yearSocialComment = req.body.comments[4]
+    yearReport.comment.yearRecreationalComment = req.body.comments[5]
 
-        if (req.body.headers.type === "personalQA")
-            yearReport.comment.yearPersonalComment = req.body.headers.comments
-        else if (req.body.headers.type === "socialQA")
-            yearReport.comment.yearSocialComment = req.body.headers.comments
-        else if (req.body.headers.type === "academicQA")
-            yearReport.comment.yearAcademicComment = req.body.headers.comments
-        else if (req.body.headers.type === "recreationalQA")
-            yearReport.comment.yearRecreationalComment = req.body.headers.comments
-        else if (req.body.headers.type === "occupationalQA")
-            yearReport.comment.yearOccupationalComment = req.body.headers.comments
-        else if (req.body.headers.type === "termComment")
-            yearReport.comment.yearComment = req.body.headers.comments
-
-        student.save()
-        res.status(200).json("Success")
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(false)
-    }
+    student.save()
+    res.status(200).json("Success")
+    // }
+    // catch (err) {
+    //     console.log(err)
+    //     res.status(400).send(false)
+    // }
 }
 
 const evaluateYearStudent = async (req, res) => {
@@ -91,10 +85,12 @@ const evaluateYearStudent = async (req, res) => {
 const evaluateStudent = async (req, res) => {
     try {
         const id = req.headers.id
+        // console.log(req.headers)
         const student = await studentModel.findOne({ regNo: id })
         const section = student.section.find(sec => sec.sec === req.headers.section)
         const yearReport = section.yearReport.find(year => year.year === req.headers.year)
         const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
+        console.log(termReport)
         let questions;
         if (req.headers.type === "personalQA")
             questions = termReport.report.personalQA
@@ -124,7 +120,7 @@ const evaluateStudent = async (req, res) => {
                 termReport.evaluated.academic = true
             }
             else if (req.headers.type === "occupationalQA") {
-                termReport.percent.occupationalComment = result
+                termReport.percent.occupationalPercent = result
                 termReport.evaluated.occupational = true
             }
         }
@@ -163,17 +159,75 @@ const evaluateStudent = async (req, res) => {
             }
         }
         if (termReport.evaluated.academic && termReport.evaluated.occupational && termReport.evaluated.personal && termReport.evaluated.recreational && termReport.evaluated.social) {
-            if (termReport.term === 'Entry')
-                newTermReport.term = 'I'
-            else if (termReport.term === 'I')
-                newTermReport.term = "II"
-            else if (termReport.term === 'II')
-                newTermReport.term = "III"
-            else
-                newTermReport.term = "III"//need to change
+            if (termReport.term !== "III") {
+                if (termReport.term === 'Entry' && termReport.length == 1)
+                    newTermReport.term = 'I'
+                else if (termReport.term === 'I' && termReport.length == 2)
+                    newTermReport.term = "II"
+                else if (termReport.term === 'II' && termReport.length == 3)
+                    newTermReport.term = "III"
+                if (newTermReport.term)
+                    yearReport.termReport.push(newTermReport)
+            }
+            else {
+                let personalPercent = 0, socialPercent = 0, academicPercent = 0, occupationalPercent = 0, recreationalPercent = 0, mode = ''
+                let count_A = 0, count_B = 0, count_C = 0, count_D = 0, count_E = 0
+                yearReport.termReport.map(term => {
+                    personalPercent = personalPercent + term.percent.personalPercent
+                    socialPercent = socialPercent + term.percent.socialPercent
+                    academicPercent = academicPercent + term.percent.academicPercent
+                    occupationalPercent = occupationalPercent + term.percent.occupationalPercent
+                    recreationalPercent = recreationalPercent + term.percent.recreationalPercent
+                    if (term.percent.mode === 'A') count_A++
+                    else if (term.percent.mode === 'B') count_B++
+                    else if (term.percent.mode === 'C') count_C++
+                    else if (term.percent.mode === 'D') count_D++
+                    else if (term.percent.mode === 'E') count_E++
+                })
+                if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_A) mode = 'A'
+                else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_B) mode = 'B'
+                else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_C) mode = 'C'
+                else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_D) mode = 'D'
+                else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_E) mode = 'E'
+                personalPercent = personalPercent / 4
+                socialPercent = socialPercent / 4
+                academicPercent = academicPercent / 4
+                occupationalPercent = occupationalPercent / 4
+                recreationalPercent = recreationalPercent / 4
+
+                personalPercent = personalPercent.toFixed(2)
+                socialPercent = socialPercent.toFixed(2)
+                academicPercent = academicPercent.toFixed(2)
+                occupationalPercent = occupationalPercent.toFixed(2)
+                recreationalPercent = recreationalPercent.toFixed(2)
+
+                const data = {
+                    personalPercent: personalPercent,
+                    socialPercent: socialPercent,
+                    academicPercent: academicPercent,
+                    occupationalPercent: occupationalPercent,
+                    recreationalPercent: recreationalPercent,
+                    mode: mode
+                }
+
+                yearReport.percent = data
+
+                const result = (personalPercent + socialPercent + academicPercent + occupationalPercent) / 4;
+                if (result >= 80) {
+                    section.status = "pass"
+                    //create new Section
+                }
+                else if(section.yearReport.length < 3){
+                    section.status = "ongoing"
+                    //create new year
+                }
+                else{
+                    section.status = "promote"
+                    //create new section after failing 3 years
+                }
+            }
         }
 
-        yearReport.termReport.push(newTermReport)
         student.save()
         res.status(200).json({ result })
     }
@@ -284,7 +338,7 @@ const getStudents = async (req, res) => {
         }
     }
     catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(404).send(false)
     }
 
@@ -415,7 +469,7 @@ const getStudentbyId = async (req, res) => {
         const data = req.headers.id
         const std = await studentModel.findOne({ regNo: data })
         if (!std) {
-            console.log('stdent not found')
+            // console.log('stdent not found')
             res.status("Bad request").json({ message: "invalid regNo" })
         }
         else {
@@ -423,7 +477,7 @@ const getStudentbyId = async (req, res) => {
             res.json(std)
         }
     } catch (err) {
-        console.log(err)
+        // console.log(err)
         res.status(500).json({ message: "internal server error" })
     }
 }
@@ -448,16 +502,16 @@ const submitTermTypeComment = async (req, res) => {
         else if (req.body.type === "occupationalQA")
             termReport.comment.occupationalComment = req.body.comments
         else {
-            console.log("-------")
+            // console.log("-------")
             termReport.comment.termComment = req.body.comments
         }
 
-        console.log(termReport.comment.termComment)
+        // console.log(termReport.comment.termComment)
         // console.log(termReport)
         student.save()
         res.status(200).json("Success")
     } catch (err) {
-        console.log(err)
+        // console.log(err)
         res.status(400).send(false)
     }
 }

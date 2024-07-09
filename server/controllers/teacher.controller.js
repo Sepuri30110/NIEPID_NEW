@@ -83,158 +83,280 @@ const evaluateYearStudent = async (req, res) => {
 }
 
 const evaluateStudent = async (req, res) => {
-    try {
-        const id = req.headers.id
-        // console.log(req.headers)
-        const student = await studentModel.findOne({ regNo: id })
-        const section = student.section.find(sec => sec.sec === req.headers.section)
-        const yearReport = section.yearReport.find(year => year.year === req.headers.year)
-        const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
-        console.log(termReport)
-        let questions;
-        if (req.headers.type === "personalQA")
-            questions = termReport.report.personalQA
-        else if (req.headers.type === "socialQA")
-            questions = termReport.report.socialQA
-        else if (req.headers.type === "academicQA")
-            questions = termReport.report.academicQA
-        else if (req.headers.type === "recreationalQA")
-            questions = termReport.report.recreationalQA
-        else if (req.headers.type === "occupationalQA")
-            questions = termReport.report.occupationalQA
+    // try {
+    const id = req.headers.id
+    // console.log(req.headers)
+    const student = await studentModel.findOne({ regNo: id })
+    const section = student.section.find(sec => sec.sec === req.headers.section)
+    const yearReport = section.yearReport.find(year => year.year === req.headers.year)
+    const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
+    console.log(termReport)
+    let questions;
+    if (req.headers.type === "personalQA")
+        questions = termReport.report.personalQA
+    else if (req.headers.type === "socialQA")
+        questions = termReport.report.socialQA
+    else if (req.headers.type === "academicQA")
+        questions = termReport.report.academicQA
+    else if (req.headers.type === "recreationalQA")
+        questions = termReport.report.recreationalQA
+    else if (req.headers.type === "occupationalQA")
+        questions = termReport.report.occupationalQA
 
-        let result
-        // console.log(questions)
-        if (req.headers.type !== "recreationalQA") {
-            result = findPercent(questions)
-            if (req.headers.type === "personalQA") {
-                termReport.percent.personalPercent = result
-                termReport.evaluated.personal = true
-            }
-            else if (req.headers.type === "socialQA") {
-                termReport.percent.socialPercent = result
-                termReport.evaluated.social = true
-            }
-            else if (req.headers.type === "academicQA") {
-                termReport.percent.academicPercent = result
-                termReport.evaluated.academic = true
-            }
-            else if (req.headers.type === "occupationalQA") {
-                termReport.percent.occupationalPercent = result
-                termReport.evaluated.occupational = true
+    let result
+    // console.log(questions)
+    if (req.headers.type !== "recreationalQA") {
+        result = findPercent(questions)
+        if (req.headers.type === "personalQA") {
+            termReport.percent.personalPercent = result
+            termReport.evaluated.personal = true
+        }
+        else if (req.headers.type === "socialQA") {
+            termReport.percent.socialPercent = result
+            termReport.evaluated.social = true
+        }
+        else if (req.headers.type === "academicQA") {
+            termReport.percent.academicPercent = result
+            termReport.evaluated.academic = true
+        }
+        else if (req.headers.type === "occupationalQA") {
+            termReport.percent.occupationalPercent = result
+            termReport.evaluated.occupational = true
+        }
+    }
+    else {
+        result = findPercentForRecreational(questions)
+        termReport.percent.recreationalPercent = result.percent
+        termReport.percent.mode = result.mode
+        termReport.evaluated.recreational = true
+    }
+
+    let newTermReport = {
+        evaluated: {
+            personal: false,
+            academic: false,
+            social: false,
+            occupational: false,
+            recreational: false
+        },
+        term: '',
+        report: findQAs(req.headers.section),
+        percent: {//Term Performance
+            personalPercent: 0,
+            socialPercent: 0,
+            academicPercent: 0,
+            occupationalPercent: 0,
+            recreationalPercent: 0,
+            mode: ""
+        },
+        comment: {//Term Comments
+            termComment: "",
+            personalComment: "",
+            occupationalComment: "",
+            recreationalComment: "",
+            academicComment: "",
+            socialComment: ""
+        }
+    }
+    if (termReport.evaluated.academic && termReport.evaluated.occupational && termReport.evaluated.personal && termReport.evaluated.recreational && termReport.evaluated.social) {
+        if (termReport.term !== "III") {
+            if (termReport.term === 'Entry' && yearReport.termReport.length == 1)
+                newTermReport.term = 'I'
+            else if (termReport.term === 'I' && yearReport.termReport.length == 2)
+                newTermReport.term = "II"
+            else if (termReport.term === 'II' && yearReport.termReport.length == 3)
+                newTermReport.term = "III"
+            if (newTermReport.term) {
+                yearReport.termReport.push(newTermReport)
+                student.currTerm = newTermReport.term
             }
         }
         else {
-            result = findPercentForRecreational(questions)
-            termReport.percent.recreationalPercent = result.percent
-            termReport.percent.mode = result.mode
-            termReport.evaluated.recreational = true
-        }
+            let personalPercent = 0, socialPercent = 0, academicPercent = 0, occupationalPercent = 0, recreationalPercent = 0, mode = ''
+            let count_A = 0, count_B = 0, count_C = 0, count_D = 0, count_E = 0
+            yearReport.termReport.map(term => {
+                personalPercent = personalPercent + term.percent.personalPercent
+                socialPercent = socialPercent + term.percent.socialPercent
+                academicPercent = academicPercent + term.percent.academicPercent
+                occupationalPercent = occupationalPercent + term.percent.occupationalPercent
+                recreationalPercent = recreationalPercent + term.percent.recreationalPercent
+                if (term.percent.mode === 'A') count_A++
+                else if (term.percent.mode === 'B') count_B++
+                else if (term.percent.mode === 'C') count_C++
+                else if (term.percent.mode === 'D') count_D++
+                else if (term.percent.mode === 'E') count_E++
+            })
+            if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_A) mode = 'A'
+            else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_B) mode = 'B'
+            else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_C) mode = 'C'
+            else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_D) mode = 'D'
+            else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_E) mode = 'E'
+            personalPercent = personalPercent / 4
+            socialPercent = socialPercent / 4
+            academicPercent = academicPercent / 4
+            occupationalPercent = occupationalPercent / 4
+            recreationalPercent = recreationalPercent / 4
 
-        let newTermReport = {
-            evaluated: {
-                personal: false,
-                academic: false,
-                social: false,
-                occupational: false,
-                recreational: false
-            },
-            term: '',
-            report: findQAs(req.headers.section),
-            percent: {//Term Performance
-                personalPercent: 0,
-                socialPercent: 0,
-                academicPercent: 0,
-                occupationalPercent: 0,
-                recreationalPercent: 0,
-                mode: ""
-            },
-            comment: {//Term Comments
-                termComment: "",
-                personalComment: "",
-                occupationalComment: "",
-                recreationalComment: "",
-                academicComment: "",
-                socialComment: ""
+            personalPercent = personalPercent.toFixed(2)
+            socialPercent = socialPercent.toFixed(2)
+            academicPercent = academicPercent.toFixed(2)
+            occupationalPercent = occupationalPercent.toFixed(2)
+            recreationalPercent = recreationalPercent.toFixed(2)
+
+            const data = {
+                personalPercent: personalPercent,
+                socialPercent: socialPercent,
+                academicPercent: academicPercent,
+                occupationalPercent: occupationalPercent,
+                recreationalPercent: recreationalPercent,
+                mode: mode
             }
-        }
-        if (termReport.evaluated.academic && termReport.evaluated.occupational && termReport.evaluated.personal && termReport.evaluated.recreational && termReport.evaluated.social) {
-            if (termReport.term !== "III") {
-                if (termReport.term === 'Entry' && termReport.length == 1)
-                    newTermReport.term = 'I'
-                else if (termReport.term === 'I' && termReport.length == 2)
-                    newTermReport.term = "II"
-                else if (termReport.term === 'II' && termReport.length == 3)
-                    newTermReport.term = "III"
-                if (newTermReport.term)
-                    yearReport.termReport.push(newTermReport)
+
+            yearReport.percent = data
+
+            const newSection = {
+                status: 'ongoing',
+                sec: '',//
+                yearReport: [{
+                    year: '1',
+                    termReport: [{
+                        term: 'Entry',
+                        report: {},
+                        comment: {
+                            termComment: "",
+                            personalComment: "",
+                            occupationalComment: "",
+                            recreationalComment: "",
+                            academicComment: "",
+                            socialComment: ""
+                        },
+                        percent: {
+                            personalPercent: null,
+                            socialPercent: null,
+                            academicPercent: null,
+                            occupationalPercent: null,
+                            recreationalPercent: null,
+                            mode: ""
+                        }
+                    }],
+                    comment: {
+                        yearPersonalComment: "",
+                        yearOccupationalComment: "",
+                        yearRecreationalComment: "",
+                        yearAcademicComment: "",
+                        yearSocialComment: "",
+                        yearComment: ""
+                    },
+                    percent: {
+                        personalPercent: null,
+                        socialPercent: null,
+                        academicPercent: null,
+                        occupationalPercent: null,
+                        recreationalPercent: null,
+                        mode: ""
+                    }
+                }],
+            }
+
+            const newYear = {
+                year: '',
+                termReport: [{
+                    term: 'Entry',
+                    report: findQAs(section.sec),
+                    comment: {
+                        termComment: "",
+                        personalComment: "",
+                        occupationalComment: "",
+                        recreationalComment: "",
+                        academicComment: "",
+                        socialComment: ""
+                    },
+                    percent: {
+                        personalPercent: null,
+                        socialPercent: null,
+                        academicPercent: null,
+                        occupationalPercent: null,
+                        recreationalPercent: null,
+                        mode: ""
+                    }
+                }],
+                comment: {
+                    yearPersonalComment: "",
+                    yearOccupationalComment: "",
+                    yearRecreationalComment: "",
+                    yearAcademicComment: "",
+                    yearSocialComment: "",
+                    yearComment: ""
+                },
+                percent: {
+                    personalPercent: null,
+                    socialPercent: null,
+                    academicPercent: null,
+                    occupationalPercent: null,
+                    recreationalPercent: null,
+                    mode: ""
+                }
+            }
+
+            const result = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4;
+            //console.log(typeof(parseFloat(personalPercent)),typeof(socialPercent),typeof(academicPercent),typeof(occupationalPercent))
+            console.log(result)
+            if (result >= 80 && yearReport.year === student.currYear && section.sec === student.currSection) {
+                section.status = "pass"
+                //create new Section
+                newSection.sec = 'primary1'
+                student.currSection = 'primary1'
+                student.currYear = '1'
+                student.currTerm = 'Entry'
+                student.classId = 'primary1_1'
+                newSection.yearReport[0].termReport[0].report = findQAs('primary1')
+                student.section.push(newSection)
+            }
+            else if (section.yearReport.length < 3 && yearReport.year === student.currYear && section.sec === student.currSection) {
+                section.status = "ongoing"
+                //create new year
+                if (section.yearReport.length === 1) {
+                    newYear.year = '2'
+                    student.currYear = '2'
+                    const currSec = student.currSection
+                    student.classId = currSec + '_2'
+                }
+                else {
+                    newYear.year = '3'
+                    student.currYear = '3'
+                    const currSec = student.currSection
+                    student.classId = currSec + '_3'
+                }
+                student.currTerm = 'Entry'
+                section.yearReport.push(newYear)
+            }
+            else if (yearReport.year === student.currYear && section.sec === student.currSection) {
+                section.status = "promote"
+                //create new section after failing 3 years
+                newSection.sec = 'primary2'
+                student.currSection = 'primary2'
+                student.currYear = '1'
+                student.currTerm = 'Entry'
+                student.classId = 'primary2_1'
+                newSection.yearReport[0].termReport[0].report = findQAs('primary2')
+                student.section.push(newSection)
             }
             else {
-                let personalPercent = 0, socialPercent = 0, academicPercent = 0, occupationalPercent = 0, recreationalPercent = 0, mode = ''
-                let count_A = 0, count_B = 0, count_C = 0, count_D = 0, count_E = 0
-                yearReport.termReport.map(term => {
-                    personalPercent = personalPercent + term.percent.personalPercent
-                    socialPercent = socialPercent + term.percent.socialPercent
-                    academicPercent = academicPercent + term.percent.academicPercent
-                    occupationalPercent = occupationalPercent + term.percent.occupationalPercent
-                    recreationalPercent = recreationalPercent + term.percent.recreationalPercent
-                    if (term.percent.mode === 'A') count_A++
-                    else if (term.percent.mode === 'B') count_B++
-                    else if (term.percent.mode === 'C') count_C++
-                    else if (term.percent.mode === 'D') count_D++
-                    else if (term.percent.mode === 'E') count_E++
-                })
-                if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_A) mode = 'A'
-                else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_B) mode = 'B'
-                else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_C) mode = 'C'
-                else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_D) mode = 'D'
-                else if (Math.max(count_A, count_B, count_C, count_D, count_E) == count_E) mode = 'E'
-                personalPercent = personalPercent / 4
-                socialPercent = socialPercent / 4
-                academicPercent = academicPercent / 4
-                occupationalPercent = occupationalPercent / 4
-                recreationalPercent = recreationalPercent / 4
-
-                personalPercent = personalPercent.toFixed(2)
-                socialPercent = socialPercent.toFixed(2)
-                academicPercent = academicPercent.toFixed(2)
-                occupationalPercent = occupationalPercent.toFixed(2)
-                recreationalPercent = recreationalPercent.toFixed(2)
-
-                const data = {
-                    personalPercent: personalPercent,
-                    socialPercent: socialPercent,
-                    academicPercent: academicPercent,
-                    occupationalPercent: occupationalPercent,
-                    recreationalPercent: recreationalPercent,
-                    mode: mode
-                }
-
-                yearReport.percent = data
-
-                const result = (personalPercent + socialPercent + academicPercent + occupationalPercent) / 4;
-                if (result >= 80) {
-                    section.status = "pass"
-                    //create new Section
-                }
-                else if(section.yearReport.length < 3){
-                    section.status = "ongoing"
-                    //create new year
-                }
-                else{
-                    section.status = "promote"
-                    //create new section after failing 3 years
-                }
+                // //trying to evaluate previous evaluated year/section
+                // console.log(yearReport.year,section.sec)
+                // console.log(student.currYear,student.currSection)
+                // res.status(201).json("Not allowed to evaluate previous year/section once evaluated")
             }
         }
+    }
 
-        student.save()
-        res.status(200).json({ result })
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(false)
-    }
+    student.save()
+    res.status(200).json({ result })
+    // }
+    // catch (err) {
+    //     console.log(err)
+    //     res.status(400).send(false)
+    // }
 }
 
 const findPercent = (arr) => {
@@ -292,18 +414,18 @@ const historyStudent = async (req, res) => {//expecting student details form req
         const std = await studentModel.findOne({ "regNo": regNo_request })
         // console.log(std)
         if (!std) {
-            res.status(400).json({ message: "stdent doesnt exists" })
+            res.status(203).json({ message: "stdent doesnt exists" })
         }
-        else if (std.currYear === "1") {
-            res.status(400).json({ data: "Newly admitted student" });
+        else if (std.section.length === 1 && std.section[0].yearReport.length === 1) {
+            res.status(202).json({ data: "Year not completed" });
         }
         else {
             // console.log(std)
-            res.status(201).json(deriveHistory(std))
+            res.status(200).json(std)
         }
     }
     catch (error) {
-        // console.log(error)
+        console.log(error)
         res.status(404).send(false)
     }
 }
@@ -484,32 +606,39 @@ const getStudentbyId = async (req, res) => {
 
 const submitTermTypeComment = async (req, res) => {
     try {
-        const id = req.body.id
-        // console.log(req.body)
-        const student = await studentModel.findOne({ regNo: id })
-        const section = student.section.find(sec => sec.sec === req.body.section)
-        const yearReport = section.yearReport.find(year => year.year === req.body.year)
-        const termReport = yearReport.termReport.find(term => term.term === req.body.term)
+    const id = req.body.id
+    let flag = true
+    // console.log(req.body)
+    const student = await studentModel.findOne({ regNo: id })
+    const section = student.section.find(sec => sec.sec === req.body.section)
+    const yearReport = section.yearReport.find(year => year.year === req.body.year)
+    const termReport = yearReport.termReport.find(term => term.term === req.body.term)
 
-        if (req.body.type === "personalQA")
-            termReport.comment.personalComment = req.body.comments
-        else if (req.body.type === "socialQA")
-            termReport.comment.socialComment = req.body.comments
-        else if (req.body.type === "academicQA")
-            termReport.comment.academicComment = req.body.comments
-        else if (req.body.type === "recreationalQA")
-            termReport.comment.recreationalComment = req.body.comments
-        else if (req.body.type === "occupationalQA")
-            termReport.comment.occupationalComment = req.body.comments
-        else {
-            // console.log("-------")
-            termReport.comment.termComment = req.body.comments
-        }
+    if (req.body.type === "personalQA")
+        termReport.comment.personalComment = req.body.comments
+    else if (req.body.type === "socialQA")
+        termReport.comment.socialComment = req.body.comments
+    else if (req.body.type === "academicQA")
+        termReport.comment.academicComment = req.body.comments
+    else if (req.body.type === "recreationalQA")
+        termReport.comment.recreationalComment = req.body.comments
+    else if (req.body.type === "occupationalQA")
+        termReport.comment.occupationalComment = req.body.comments
+    else if (termReport.comment.personalComment && termReport.comment.socialComment && termReport.comment.academicComment && termReport.comment.occupationalComment && termReport.comment.recreationalComment) {
+        // console.log("-------")
+        termReport.comment.termComment = req.body.comments
+    }
+    else {
+        flag = false
+        res.status(201).json("no comments updated")
+    }
 
-        // console.log(termReport.comment.termComment)
-        // console.log(termReport)
+    // console.log(termReport.comment.termComment)
+    // console.log(termReport)
+    if (flag) {
         student.save()
         res.status(200).json("Success")
+    }
     } catch (err) {
         // console.log(err)
         res.status(400).send(false)

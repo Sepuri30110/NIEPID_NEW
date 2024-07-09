@@ -39,7 +39,7 @@ const StudentReport = new mongoose.Schema({
         sec: {
             type: String,
             required: true,
-            enum: ['preprimary', 'primary']
+            enum: ['preprimary', 'primary1','primary2']
         },
         yearReport: [{
             year: {

@@ -13,7 +13,6 @@ const studentJsonGenerate = (data, v1) => {
         sec: data.formData.stdCred.section,
         yearReport: [{
             year: 1,
-            yearComment: "",
             termReport: [{
                 term: "Entry",
                 report: findQAs(data.formData.stdCred.section),

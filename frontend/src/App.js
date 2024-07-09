@@ -52,7 +52,6 @@ export default function App() {
             <Route exact path="/admin/addstudents" element={<AddStudents />} />
             <Route exact path="/admin/viewteachers" element={<ViewTeachers />} />
             <Route exact path="/admin/viewstudents" element={<ViewStudents />} />
-
           </Route>
           <Route element={<StudentPrivateRoute />}>
             <Route exact path="/student" element={<Student />} />

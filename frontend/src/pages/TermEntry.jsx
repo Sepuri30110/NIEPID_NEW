@@ -10,7 +10,21 @@ const Front = () => {
     const year = localStorage.getItem("year");
     const section = localStorage.getItem("section");
 
-    const [oldComments, setOldComments] = useState(["", "", "", "", "", ""]);
+    const [oldyearComment, setoldYearComment] = useState('')
+    const [oldYearPersonalComment, setoldYearPersonalComment] = useState('')
+    const [oldYearSocialComment, setoldYearSocialComment] = useState('')
+    const [oldYearAcademicComment, setoldYearAcademicComment] = useState('')
+    const [oldYearOccupationalComment, setoldYearOccupationalComment] = useState('')
+    const [oldYearRecreationalComment, setoldYearRecreationalComment] = useState('')
+
+    const [percent, setPercent] = useState({
+        personalPercent: '',
+        socialPercent: '',
+        academicPercent: '',
+        occupationalPercent: '',
+        recreationalPercent: ''
+    })
+
     const [comments, setComments] = useState(["", "", "", "", "", ""]);
     const [terms, setTerms] = useState([]);
 
@@ -45,44 +59,36 @@ const Front = () => {
                     },
                 });
                 const data = res.data;
-                // console.log(res)
                 const sectionData = data.section.find(s => s.sec === section);
                 const yearData = sectionData.yearReport.find(y => y.year === year);
+                console.log(yearData)
 
-                if (yearData.termReport.length == 4)
+                if (yearData.termReport.length == 4) {
                     if (yearData.termReport[3].evaluated.personal)
                         if (yearData.termReport[3].evaluated.social)
                             if (yearData.termReport[3].evaluated.academic)
                                 if (yearData.termReport[3].evaluated.occupational)
                                     if (yearData.termReport[3].evaluated.recreational)
                                         setEvaluationComplete(true);
+                }
 
-
-                // yearData.termReport.forEach(term => {
-                //     if (term.comment.termComment.trim() !== "") {
-                //         const newOldComments = [...oldComments];
-                //         newOldComments[term.term - 1] = term.comment.termComment;
-                //         setOldComments(newOldComments);
-                //     }
-                // });
-
-                let index = 0
-                yearData.termReport.map(year => {
-                    if (year.comment.termComment.trim() !== "") {
-                        const newOldComments = [...oldComments];
-                        newOldComments[index] = year.comment.termComment;
-                        setOldComments(newOldComments)
-                    }
-                })
-
-                // console.log(yearData.termReport.length)
+                setPercent(yearData.percent)
 
                 const t = []
                 yearData.termReport.map(term => {
                     t.push(term.term)
                 })
+
+                setoldYearComment(yearData.comment.yearComment)
+                setoldYearPersonalComment(yearData.comment.yearPersonalComment)
+                setoldYearSocialComment(yearData.comment.yearSocialComment)
+                setoldYearAcademicComment(yearData.comment.yearAcademicComment)
+                setoldYearOccupationalComment(yearData.comment.yearOccupationalComment)
+                setoldYearRecreationalComment(yearData.comment.yearRecreationalComment)
+
                 console.log(t)
                 setTerms(t)
+
             } catch (err) {
                 console.log(err);
             }
@@ -140,66 +146,93 @@ const Front = () => {
                 </div>
             </main>
 
-            <label>Enter your comments for year</label>
-            <textarea
-                name="comments1"
-                value={comments[0]}
-                onChange={handleCommentsChange(0)}
-                style={styles.textArea}
-                placeholder={oldComments[0] || "Enter your comments for year"}
-                disabled={!evaluationComplete}
-            />
+            {/* <label style={{alignSelf:'center',fontSize:'35px',fontFamily:'cursive',fontWeight:'bold'}}>{(percent.personalPercent + percent.academicPercent + percent.occupationalPercent + percent.socialPercent)/4 > 80 ? "Pass" : "Fail"}</label>
+            <br/> */}
+            <div style={styles.box}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label>Enter your comments for Year</label>
+                    <label>Year Percent : {(percent.personalPercent + percent.academicPercent + percent.occupationalPercent + percent.socialPercent)/4}</label>
+                </div>
+                <textarea
+                    name="comments1"
+                    value={comments[0]}
+                    onChange={handleCommentsChange(0)}
+                    style={styles.textArea}
+                    placeholder={oldyearComment.trim() === "" ? "Enter your year comment" : oldyearComment}
+                    disabled={!evaluationComplete}
+                />
+            </div>
 
-            <label>Enter your comments for personal</label>
-            <textarea
-                name="comments2"
-                value={comments[1]}
-                onChange={handleCommentsChange(1)}
-                style={styles.textArea}
-                placeholder={oldComments[1] || "Enter your comments for personal"}
-                disabled={!evaluationComplete}
-            />
-
-            <label>Enter your comments for occupational</label>
-            <textarea
-                name="comments3"
-                value={comments[2]}
-                onChange={handleCommentsChange(2)}
-                style={styles.textArea}
-                placeholder={oldComments[2] || "Enter your comments for occupational"}
-                disabled={!evaluationComplete}
-            />
-
-            <label>Enter your comments for academic</label>
-            <textarea
-                name="comments4"
-                value={comments[3]}
-                onChange={handleCommentsChange(3)}
-                style={styles.textArea}
-                placeholder={oldComments[3] || "Enter your comments for academic"}
-                disabled={!evaluationComplete}
-            />
-
-            <label>Enter your comments for social</label>
-            <textarea
-                name="comments5"
-                value={comments[4]}
-                onChange={handleCommentsChange(4)}
-                style={styles.textArea}
-                placeholder={oldComments[4] || "Enter your comments for social"}
-                disabled={!evaluationComplete}
-            />
-
-            <label>Enter your comments for recreational</label>
-            <textarea
-                name="comments6"
-                value={comments[5]}
-                onChange={handleCommentsChange(5)}
-                style={styles.textArea}
-                placeholder={oldComments[5] || "Enter your comments for recreational"}
-                disabled={!evaluationComplete}
-            />
-
+            <div style={styles.box}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label>Enter your comments for personal</label>
+                    <label>Personal Percent : {percent.personalPercent}</label>
+                </div>
+                <textarea
+                    name="comments2"
+                    value={comments[1]}
+                    onChange={handleCommentsChange(1)}
+                    style={styles.textArea}
+                    placeholder={oldYearPersonalComment.trim() === "" ? "Enter your year personal comment" : oldYearPersonalComment}
+                    disabled={!evaluationComplete}
+                />
+            </div>
+            <div style={styles.box}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label>Enter your comments for occupational</label>
+                    <label>Occupational Percent : {percent.occupationalPercent}</label>
+                </div>
+                <textarea
+                    name="comments3"
+                    value={comments[2]}
+                    onChange={handleCommentsChange(2)}
+                    style={styles.textArea}
+                    placeholder={oldYearOccupationalComment.trim() === "" ? "Enter your year personal comment" : oldYearOccupationalComment}
+                    disabled={!evaluationComplete}
+                />
+            </div>
+            <div style={styles.box}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label>Enter your comments for academic</label>
+                    <label>Academic Percent : {percent.academicPercent}</label>
+                </div>
+                <textarea
+                    name="comments4"
+                    value={comments[3]}
+                    onChange={handleCommentsChange(3)}
+                    style={styles.textArea}
+                    placeholder={oldYearAcademicComment.trim() === "" ? "Enter your year academic comment" : oldYearAcademicComment}
+                    disabled={!evaluationComplete}
+                />
+            </div>
+            <div style={styles.box}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label>Enter your comments for social</label>
+                    <label>Social Percent : {percent.socialPercent}</label>
+                </div>
+                <textarea
+                    name="comments5"
+                    value={comments[4]}
+                    onChange={handleCommentsChange(4)}
+                    style={styles.textArea}
+                    placeholder={oldYearSocialComment.trim() === "" ? "Enter your year social comment" : oldYearSocialComment}
+                    disabled={!evaluationComplete}
+                />
+            </div>
+            <div style={styles.box}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label>Enter your comments for recreational</label>
+                    <label>Recreational Percent : {percent.recreationalPercent}</label>
+                </div>
+                <textarea
+                    name="comments6"
+                    value={comments[5]}
+                    onChange={handleCommentsChange(5)}
+                    style={styles.textArea}
+                    placeholder={oldYearRecreationalComment.trim() === "" ? "Enter your year Recreational comment" : oldYearRecreationalComment}
+                    disabled={!evaluationComplete}
+                />
+            </div>
             <button id="submit" style={styles.submitButton} onClick={handleSubmit} disabled={!evaluationComplete}>
                 Submit
             </button>
@@ -307,13 +340,19 @@ const styles = {
         },
     },
     textArea: {
-        width: '80%',
+        width: '100%',
         height: '100px',
         margin: '10px auto',
         padding: '10px',
         fontSize: '16px',
         borderRadius: '4px',
         border: '1px solid #ddd',
+    },
+    box: {
+        display: 'flex',
+        width: '80%',
+        alignSelf: 'center',
+        flexDirection: 'column'
     },
     footer: {
         textAlign: 'center',

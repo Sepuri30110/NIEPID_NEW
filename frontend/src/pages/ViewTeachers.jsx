@@ -15,6 +15,7 @@ const TeacherTable = () => {
 
     // Fetch the role from localStorage
     const role = localStorage.getItem('role');
+    role === "admin" ?console.log("calling as admin"):console.log("calling as pricipal")
 
     const fetchData = async () => {
         try {
@@ -22,14 +23,14 @@ const TeacherTable = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     authorization: `Bearer ${localStorage.getItem("token")}`
-                },
-                withCredentials: true
+                }},
+                {withCredentials: true
             }) : await axios.get('http://localhost:4000/principle/viewTeacher', {
                 headers: {
                     'Content-Type': 'application/json',
                     authorization: `Bearer ${localStorage.getItem("token")}`
-                },
-                withCredentials: true
+                }},
+                {withCredentials: true
             })
             setTeacherDetails(response.data.data);
         } catch (error) {
@@ -61,8 +62,8 @@ const TeacherTable = () => {
                     headers: {
                         'Content-Type': 'application/json',
                         authorization: `Bearer ${localStorage.getItem("token")}`
-                    },
-                    withCredentials: true
+                    }},
+                {withCredentials: true
                 }
             );
 

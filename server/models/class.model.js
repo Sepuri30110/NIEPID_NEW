@@ -11,7 +11,7 @@ const Class = new mongoose.Schema({
     },
     section: {
         type: String,
-        enum: ["preprimary","primary"]
+        enum: ["preprimary","primary1","primary2"]
     },
     year: {
         type: String,

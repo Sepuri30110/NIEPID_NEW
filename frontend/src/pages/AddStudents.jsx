@@ -2525,7 +2525,8 @@ function AddStudents() {
                 >
                     <option value="">Select Section</option>
                     <option value="preprimary">preprimary</option>
-                    <option value="primary">primary</option>
+                    <option value="primary1">primary1</option>
+                    <option value="primary2">primary2</option>
                 </select>
             </label>
             <label className={classes.label}>

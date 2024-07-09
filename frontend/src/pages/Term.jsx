@@ -32,6 +32,7 @@ const Term = () => {
       } catch (err) {
         console.error("Error fetching student data", err.response);
       }
+      
     };
 
     fetchStudentData();

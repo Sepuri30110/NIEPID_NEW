@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import 'chart.js/auto';
 import image from './th.jpeg';
+import 'chart.js/auto';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-
+import { toast } from 'react-toastify';
 
 const styles = {
     header: {
@@ -29,25 +29,38 @@ const styles = {
         fontSize: "1.5rem",
         fontWeight: "bold",
     },
-    navLinks: {
-        display: "flex",
-        alignItems: "center",
-    },
-    button: {
-        padding: "10px 15px",
-        backgroundColor: "#ffffff",
-        color: "#007bff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        fontWeight: "bold",
-    },
     footer: {
         textAlign: "center",
         padding: "1rem",
         backgroundColor: "#007bff",
         color: "#ffffff",
     },
+    selector: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+        marginBottom: "2rem",
+        padding: "1rem",
+        backgroundColor: "#f9f9f9",
+        borderRadius: "5px",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    label: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.5rem",
+    },
+    select: {
+        padding: "0.5rem",
+        borderRadius: "5px",
+        border: "1px solid #ccc",
+        fontSize: "1rem",
+        outline: "none",
+        transition: "border-color 0.2s",
+    },
+    selectHover: {
+        borderColor: "#007bff",
+    }
 };
 
 const Header = () => (
@@ -63,164 +76,373 @@ const Footer = () => (
     <footer style={styles.footer}>&copy; 2024 Student History Portal</footer>
 );
 
-const StudentReport = ({ data }) => {
-    const [selectedYear, setSelectedYear] = useState(data.yearReport[0].year);
-    const [isEditing, setIsEditing] = useState(false);
-    const [updatedComments, setUpdatedComments] = useState({
-        yearComment: '',
-        yearPersonalComment: '',
-        yearOccupationalComment: '',
-        yearRecreationalComment: '',
-        yearAcademicComment: '',
-        yearSocialComment: ''
+const StudentPerformance = () => {
+    const navigate = useNavigate()
+    const id = localStorage.getItem("studentId")
+    useEffect(async () => {
+        axios.get("http://localhost:4000/teacher/history", {
+            headers: {
+                id: id,
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        })
+        .then(res=>{
+            console.log(res)
+            if(res.status != 200)
+            {
+                toast.error("Student is still in 1st Year", {
+                    position: "top-right",
+                  });
+                navigate('/teacher')
+            }
+            setStudentInfo(res.data)
+
+        })
+        .catch(err=>{
+            console.log(err.response)
+        })
+    },[])
+
+    const [studentInfo, setStudentInfo] = useState({
+        name: "rohanKrishna",
+        regNo: "22B81A6599",
+        currYear: "3",
+        currSection: "primary",
+        classId: "primary_3",
+        section: [
+            {
+                sec: "preprimary",
+                yearReport: [
+                    {
+                        year: "1",
+                        termReport: [
+                            {
+                                term: "Entry",
+                                percent: {
+                                    personalPercent: 75,
+                                    socialPercent: 60,
+                                    academicPercent: 85,
+                                    occupationalPercent: 70,
+                                    recreationalPercent: 80,
+                                    mode: "A"
+                                },
+                                comment: {
+                                    termComment: "Good progress overall.",
+                                    personalComment: "Needs improvement in behavior.",
+                                    occupationalComment: "Not interested in occupational activities.",
+                                    recreationalComment: "Active participation in recreational activities.",
+                                    academicComment: "Shows potential in academics.",
+                                    socialComment: "Could improve social interaction."
+                                }
+                            },
+                            {
+                                term: "I",
+                                percent: {
+                                    personalPercent: 70,
+                                    socialPercent: 70,
+                                    academicPercent: 90,
+                                    occupationalPercent: 60,
+                                    recreationalPercent: 85,
+                                    mode: "B"
+                                },
+                                comment: {
+                                    termComment: "Steady progress observed.",
+                                    personalComment: "Showing improvement in behavior.",
+                                    occupationalComment: "Not interested in occupational activities.",
+                                    recreationalComment: "Enjoying recreational activities.",
+                                    academicComment: "Consistent performance in academics.",
+                                    socialComment: "Good interaction with peers."
+                                }
+                            },
+                            {
+                                term: "II",
+                                percent: {
+                                    personalPercent: 80,
+                                    socialPercent: 75,
+                                    academicPercent: 88,
+                                    occupationalPercent: 80,
+                                    recreationalPercent: 70,
+                                    mode: "C"
+                                },
+                                comment: {
+                                    termComment: "Excellent start to the year.",
+                                    personalComment: "Behavior has improved significantly.",
+                                    occupationalComment: "Not interested in occupational activities.",
+                                    recreationalComment: "Engaging in recreational activities.",
+                                    academicComment: "Improving consistently in academics.",
+                                    socialComment: "Good interaction with peers."
+                                }
+                            },
+                            {
+                                term: "III",
+                                percent: {
+                                    personalPercent: 85,
+                                    socialPercent: 80,
+                                    academicPercent: 90,
+                                    occupationalPercent: 90,
+                                    recreationalPercent: 65,
+                                    mode: "D"
+                                },
+                                comment: {
+                                    termComment: "Strong finish to the year.",
+                                    personalComment: "Consistently good behavior.",
+                                    occupationalComment: "Not interested in occupational activities.",
+                                    recreationalComment: "Participating in recreational activities.",
+                                    academicComment: "Excellent performance in academics.",
+                                    socialComment: "Excellent interaction with peers."
+                                }
+                            }
+                        ],
+                        percent: {
+                            personalPercent: 75,
+                            socialPercent: 60,
+                            academicPercent: 85,
+                            occupationalPercent: 80,
+                            recreationalPercent: 80,
+                            mode: "A"
+                        },
+                        comment: {
+                            termComment: "Good progress overall.",
+                            personalComment: "Needs improvement in behavior.",
+                            occupationalComment: "Not interested in occupational activities.",
+                            recreationalComment: "Active participation in recreational activities.",
+                            academicComment: "Shows potential in academics.",
+                            socialComment: "Could improve social interaction."
+                        }
+                    },
+                ]
+            },
+            {
+                sec: "primary",
+                yearReport: [
+                    {
+                        year: "1",
+                        termReport: [
+                            {
+                                term: "Entry",
+                                percent: {
+                                    personalPercent: 82,
+                                    socialPercent: 78,
+                                    academicPercent: 89,
+                                    occupationalPercent: 40,
+                                    recreationalPercent: 75,
+                                    mode: "A"
+                                },
+                                comment: {
+                                    termComment: "Strong start to the year.",
+                                    personalComment: "Consistently good behavior.",
+                                    occupationalComment: "Not interested in occupational activities.",
+                                    recreationalComment: "Active participation in recreational activities.",
+                                    academicComment: "Excellent performance in academics.",
+                                    socialComment: "Excellent interaction with peers."
+                                }
+                            },
+                            {
+                                term: "I",
+                                percent: {
+                                    personalPercent: 85,
+                                    socialPercent: 80,
+                                    academicPercent: 92,
+                                    occupationalPercent: 60,
+                                    recreationalPercent: 80,
+                                    mode: "B"
+                                },
+                                comment: {
+                                    termComment: "Consistently strong performance.",
+                                    personalComment: "Excellent behavior throughout the term.",
+                                    occupationalComment: "Not interested in occupational activities.",
+                                    recreationalComment: "Enjoying recreational activities.",
+                                    academicComment: "Outstanding academic achievements.",
+                                    socialComment: "Excellent interaction with peers."
+                                }
+                            },
+                            {
+                                term: "II",
+                                percent: {
+                                    personalPercent: 88,
+                                    socialPercent: 82,
+                                    academicPercent: 95,
+                                    occupationalPercent: 90,
+                                    recreationalPercent: 85,
+                                    mode: "C"
+                                },
+                                comment: {
+                                    termComment: "Exceptional progress this term.",
+                                    personalComment: "Excellent behavior and attitude.",
+                                    occupationalComment: "Not interested in occupational activities.",
+                                    recreationalComment: "Participating actively in recreational activities.",
+                                    academicComment: "Consistently outstanding academic performance.",
+                                    socialComment: "Excellent interaction with peers."
+                                }
+                            },
+                            {
+                                term: "III",
+                                percent: {
+                                    personalPercent: 90,
+                                    socialPercent: 85,
+                                    academicPercent: 98,
+                                    occupationalPercent: 80,
+                                    recreationalPercent: 90,
+                                    mode: "D"
+                                },
+                                comment: {
+                                    termComment: "Outstanding end to the year.",
+                                    personalComment: "Exemplary behavior and dedication.",
+                                    occupationalComment: "Not interested in occupational activities.",
+                                    recreationalComment: "Actively participates in recreational activities.",
+                                    academicComment: "Outstanding academic achievements.",
+                                    socialComment: "Exceptional interaction with peers."
+                                }
+                            }
+                        ],
+                        percent: {
+                            personalPercent: 75,
+                            socialPercent: 60,
+                            academicPercent: 85,
+                            occupationalPercent: 70,
+                            recreationalPercent: 80,
+                            mode: "A"
+                        },
+                        comment: {
+                            termComment: "Good progress overall.",
+                            personalComment: "Needs improvement in behavior.",
+                            occupationalComment: "Not interested in occupational activities.",
+                            recreationalComment: "Active participation in recreational activities.",
+                            academicComment: "Shows potential in academics.",
+                            socialComment: "Could improve social interaction."
+                        }
+                    },
+                ]
+            }
+        ]
     });
 
-    const handleYearChange = (e) => {
-        if (e.target.textContent.length > 4) {
-            return;
-        }
-        const year = e.target.textContent
-        setSelectedYear(year);
-        setIsEditing(false);
-    };
+    const [selectedSection, setSelectedSection] = useState(studentInfo.section[0].sec);
+    const [selectedYear, setSelectedYear] = useState("1");
 
-    const getYearData = (year) => {
-        return data.yearReport.find((yr) => yr.year === year);
-    };
-
-    const selectedYearData = getYearData(selectedYear);
-
-    const calculateAverages = () => {
-        const topics = ['personalPercent', 'academicPercent', 'occupationalPercent', 'recreationalPercent', 'socialPercent'];
-        const averages = topics.reduce((acc, topic) => {
-            acc[topic] = selectedYearData.termReport.reduce((sum, term) => sum + term.report[topic], 0) / selectedYearData.termReport.length;
-            return acc;
-        }, {});
-        return averages;
-    };
-
-    const averages = calculateAverages();
+    const selectedSectionData = studentInfo.section.find(section => section.sec === selectedSection);
+    const selectedYearData = selectedSectionData.yearReport.find(year => year.year === selectedYear);
+    console.log(studentInfo)
 
     const chartData = {
-        labels: ['Personal', 'Academic', 'Occupational', 'Recreational', 'Social'],
+        labels: ['Personal', 'Social', 'Academic', 'Occupational', 'Recreational'],
         datasets: [
-            {
-                label: 'Term 1',
+            ...selectedYearData.termReport.map(termData => ({
+                label: termData.term,
                 data: [
-                    selectedYearData.termReport[0].report.personalPercent,
-                    selectedYearData.termReport[0].report.academicPercent,
-                    selectedYearData.termReport[0].report.occupationalPercent,
-                    selectedYearData.termReport[0].report.recreationalPercent,
-                    selectedYearData.termReport[0].report.socialPercent,
+                    termData.percent.personalPercent,
+                    termData.percent.socialPercent,
+                    termData.percent.academicPercent,
+                    termData.percent.occupationalPercent,
+                    termData.percent.recreationalPercent
                 ],
-                backgroundColor: '#87ceeb',
-                barPercentage: 1,
-                categoryPercentage: 0.5,
-            },
-            {
-                label: 'Term 2',
-                data: [
-                    selectedYearData.termReport[1].report.personalPercent,
-                    selectedYearData.termReport[1].report.academicPercent,
-                    selectedYearData.termReport[1].report.occupationalPercent,
-                    selectedYearData.termReport[1].report.recreationalPercent,
-                    selectedYearData.termReport[1].report.socialPercent,
-                ],
-                backgroundColor: '#4682b4 ',
-                barPercentage: 1,
-                categoryPercentage: 0.5,
-            },
-            {
-                label: 'Term 3',
-                data: [
-                    selectedYearData.termReport[2].report.personalPercent,
-                    selectedYearData.termReport[2].report.academicPercent,
-                    selectedYearData.termReport[2].report.occupationalPercent,
-                    selectedYearData.termReport[2].report.recreationalPercent,
-                    selectedYearData.termReport[2].report.socialPercent,
-                ],
-                backgroundColor: '#035096',
-                barPercentage: 1,
-                categoryPercentage: 0.5,
-            },
-            {
-                label: 'Term 4',
-                data: [
-                    selectedYearData.termReport[3].report.personalPercent,
-                    selectedYearData.termReport[3].report.academicPercent,
-                    selectedYearData.termReport[3].report.occupationalPercent,
-                    selectedYearData.termReport[3].report.recreationalPercent,
-                    selectedYearData.termReport[3].report.socialPercent,
-                ],
-                backgroundColor: '#45b1e8 ',
-                barPercentage: 1,
-                categoryPercentage: 0.5,
-            },
+                backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`
+            })),
             {
                 label: 'Average',
                 data: [
-                    averages.personalPercent,
-                    averages.academicPercent,
-                    averages.occupationalPercent,
-                    averages.recreationalPercent,
-                    averages.socialPercent,
+                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.personalPercent, 0) / selectedYearData.termReport.length,
+                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.socialPercent, 0) / selectedYearData.termReport.length,
+                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.academicPercent, 0) / selectedYearData.termReport.length,
+                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.occupationalPercent, 0) / selectedYearData.termReport.length,
+                    selectedYearData.termReport.reduce((acc, termData) => acc + termData.percent.recreationalPercent, 0) / selectedYearData.termReport.length
                 ],
-                backgroundColor: '#000080',
-                barPercentage: 0.5,
-                categoryPercentage: 1,
-            },
-        ],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderWidth: 1
+            }
+        ]
     };
 
     const options = {
-        indexAxis: 'x',
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: selectedYear + ' Year Performance',
-            },
-        },
         scales: {
-            x: {
-                stacked: false,
-                beginAtZero: true,
-            },
             y: {
-                stacked: false,
-            },
-        },
-    };
-
-    const handleEditClick = () => {
-        setIsEditing(true);
-        setUpdatedComments({
-            yearComment: selectedYearData.yearComment,
-            yearPersonalComment: selectedYearData.yearPersonalComment,
-            yearOccupationalComment: selectedYearData.yearOccupationalComment,
-            yearRecreationalComment: selectedYearData.yearRecreationalComment,
-            yearAcademicComment: selectedYearData.yearAcademicComment,
-            yearSocialComment: selectedYearData.yearSocialComment,
-        });
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setUpdatedComments((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleSaveClick = () => {
-        //update the data in the backend
-        Object.assign(selectedYearData, updatedComments);
-        setIsEditing(false);
+                beginAtZero: true,
+                max: 100
+            }
+        }
     };
 
     return (
-        <div style={{ margin: '0px', fontFamily: 'Arial, sans-serif' }}>
+        <div>
             <Header />
+            <div className="container">
+                <h1>Student Information</h1>
+                <div className="student-info">
+                    <p><strong>Name:</strong> {studentInfo.name}</p>
+                    <p><strong>Registration Number:</strong> {studentInfo.regNo}</p>
+                    <p><strong>Current Year:</strong> {studentInfo.currYear}</p>
+                    <p><strong>Current Section:</strong> {studentInfo.currSection}</p>
+                    <p><strong>Class ID:</strong> {studentInfo.classId}</p>
+                </div>
+                <h2>Select Section and Year</h2>
+                <div className="year-selector" style={styles.selector}>
+                    <label style={styles.label}>
+                        Section:
+                        <select value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)} style={styles.select}>
+                            {studentInfo.section.map(sec => (
+                                <option key={sec.sec} value={sec.sec}>{sec.sec}</option>
+                            ))}
+                        </select>
+                    </label>
+                    <br />
+                    <label style={styles.label}>
+                        Year:
+                        <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} style={styles.select}>
+                            {selectedSectionData.yearReport.map(year => (
+                                <option key={year.year} value={year.year}>{year.year}</option>
+                            ))}
+                        </select>
+                    </label>
+                </div>
+                {selectedYearData ? (
+                    <>
+                        <div className="chart-container">
+                            <h2>Percentage Breakdown by Term</h2>
+                            <Bar data={chartData} options={options} height={100} />
+                        </div>
+                        <div className="term-details">
+                            <h2>Comments</h2>
+                            {selectedYearData.termReport.map(termData => (
+                                <div key={termData.term} className="term-row">
+                                    <h3>{termData.term} Term</h3>
+                                    <p><strong>Term Comment:</strong>{termData.comment.termComment}</p>
+                                    <p><strong>Personal Comment:</strong>{termData.comment.personalComment}</p>
+                                    <p><strong>Social Comment:</strong>{termData.comment.socialComment}</p>
+                                    <p><strong>Academic Comment:</strong>{termData.comment.academicComment}</p>
+                                    <p><strong>Occupational Comment:</strong>{termData.comment.occupationalComment}</p>
+                                    <p><strong>Recreational Comment:</strong>{termData.comment.recreationalComment}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="year-details">
+                            <h2>Year Summary</h2>
+                            <div className="year-summary">
+                                <div className="year-summary-box">
+                                    <h3>Year Percentages</h3>
+                                    <p><strong>Personal:</strong> {selectedYearData.percent.personalPercent}%</p>
+                                    <p><strong>Social:</strong> {selectedYearData.percent.socialPercent}%</p>
+                                    <p><strong>Academic:</strong> {selectedYearData.percent.academicPercent}%</p>
+                                    <p><strong>Occupational:</strong> {selectedYearData.percent.occupationalPercent}%</p>
+                                    <p><strong>Recreational:</strong> {selectedYearData.percent.recreationalPercent}%</p>
+                                </div>
+                                <div className="year-summary-box">
+                                    <h3>Year Comments</h3>
+                                    <p><strong>Year Comment:</strong>{selectedYearData.comment.yearComment}</p>
+                                    <p><strong>Personal Comment:</strong>{selectedYearData.comment.yearPersonalComment}</p>
+                                    <p><strong>Social Comment:</strong>{selectedYearData.comment.yearSocialComment}</p>
+                                    <p><strong>Academic Comment:</strong>{selectedYearData.comment.yearAcademicComment}</p>
+                                    <p><strong>Occupational Comment:</strong>{selectedYearData.comment.yearOccupationalComment}</p>
+                                    <p><strong>Recreational Comment:</strong>{selectedYearData.comment.yearRecreationalComment}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <p>No data available for the selected year.</p>
+                )}
+            </div>
+            <Footer />
             <style>
                 {`
                     .student-info, .year-selector {
@@ -251,7 +473,7 @@ const StudentReport = ({ data }) => {
 
                     .term-details .term-row {
                         display: flex;
-                        justify-content: space-between;
+                        flex-direction: column;
                         padding: 10px;
                         background-color: #f0f0f0;
                         margin-bottom: 10px;
@@ -262,423 +484,21 @@ const StudentReport = ({ data }) => {
                         margin-bottom: 10px;
                     }
 
-                    .edit-form input {
-                        display: block;
-                        width: 100%;
-                        margin-bottom: 10px;
-                        padding: 8px;
-                        border: 1px solid #ccc;
-                        border-radius: 5px;
+                    .year-summary {
+                        display: flex;
+                        justify-content: space-between;
                     }
 
-                    .edit-form button {
-                        padding: 10px 15px;
-                        cursor: pointer;
-                        background-color: #28a745;
-                        color: white;
-                        border: none;
+                    .year-summary-box {
+                        background-color: #f0f0f0;
+                        padding: 20px;
                         border-radius: 5px;
+                        width: 45%;
                     }
                 `}
             </style>
-            <h1>Student Report</h1>
-            <div className="student-info">
-                <p><strong>Reg No:</strong> {data.regNo}</p>
-                <p><strong>Name:</strong> {data.name}</p>
-                <p><strong>Current Year:</strong> {data.currYear}</p>
-                <p><strong>Class ID:</strong> {data.classId}</p>
-                <p><strong>Select the year to view the history:</strong></p>
-            </div>
-            <div className="year-selector">
-                {data.yearReport.map((year) => (
-                    <button key={year.year} onClick={(e) => handleYearChange(e)}>
-                        {/* {year.year} */}
-                        {year.termReport.length == 4 ? year.year : year.year + " is not completed"}
-                        {/* {year.termReport.length == 4 ? console.log(year.termReport.length) : console.log(year.termReport.length)} */}
-                    </button>
-                ))}
-            </div>
-            <div className="chart-container">
-                <Bar data={chartData} options={options} />
-            </div>
-            <div>
-                <h3>Averages for {selectedYear} year</h3>
-                <p><strong>Personal:</strong> {averages.personalPercent.toFixed(2)}%</p>
-                <p><strong>Academic:</strong> {averages.academicPercent.toFixed(2)}%</p>
-                <p><strong>Occupational:</strong> {averages.occupationalPercent.toFixed(2)}%</p>
-                <p><strong>Recreational:</strong> {averages.recreationalPercent.toFixed(2)}%</p>
-                <p><strong>Social:</strong> {averages.socialPercent.toFixed(2)}%</p>
-            </div>
-            <div className="year-details">
-                <h2>{selectedYear} Report</h2>
-                {isEditing ? (
-                    <div className="edit-form">
-                        <input
-                            type="text"
-                            name="yearComment"
-                            value={updatedComments.yearComment}
-                            onChange={handleInputChange}
-                        />
-                        <input
-                            type="text"
-                            name="yearPersonalComment"
-                            value={updatedComments.yearPersonalComment}
-                            onChange={handleInputChange}
-                        />
-                        <input
-                            type="text"
-                            name="yearOccupationalComment"
-                            value={updatedComments.yearOccupationalComment}
-                            onChange={handleInputChange}
-                        />
-                        <input
-                            type="text"
-                            name="yearRecreationalComment"
-                            value={updatedComments.yearRecreationalComment}
-                            onChange={handleInputChange}
-                        />
-                        <input
-                            type="text"
-                            name="yearAcademicComment"
-                            value={updatedComments.yearAcademicComment}
-                            onChange={handleInputChange}
-                        />
-                        <input
-                            type="text"
-                            name="yearSocialComment"
-                            value={updatedComments.yearSocialComment}
-                            onChange={handleInputChange}
-                        />
-                        <button onClick={handleSaveClick}>Save</button>
-                    </div>
-                ) : (
-                    <div>
-                        <p><strong>Year Comment:</strong> {selectedYearData.yearComment}</p>
-                        <p><strong>Personal Comment:</strong> {selectedYearData.yearPersonalComment}</p>
-                        <p><strong>Occupational Comment:</strong> {selectedYearData.yearOccupationalComment}</p>
-                        <p><strong>Recreational Comment:</strong> {selectedYearData.yearRecreationalComment}</p>
-                        <p><strong>Academic Comment:</strong> {selectedYearData.yearAcademicComment}</p>
-                        <p><strong>Social Comment:</strong> {selectedYearData.yearSocialComment}</p>
-                        <button onClick={handleEditClick}>Edit</button>
-                    </div>
-                )}
-            </div>
-            <div className="term-details">
-                {selectedYearData.termReport.map((term) => (
-                    <div key={term.term}>
-                        <h3>{term.term} Comments</h3>
-                        <div className="term-row">
-                            <p><strong>Term Comment:</strong> {term.termComment}</p>
-                        </div>
-                        <div className="term-row">
-                            <p><strong>Personal Comment:</strong> {term.personalComment}</p>
-                            <p><strong>Personal Percentage:</strong> {term.report.personalPercent}%</p>
-                        </div>
-                        <div className="term-row">
-                            <p><strong>Occupational Comment:</strong> {term.occupationalComment}</p>
-                            <p><strong>Occupational Percentage:</strong> {term.report.occupationalPercent}%</p>
-                        </div>
-                        <div className="term-row">
-                            <p><strong>Recreational Comment:</strong> {term.recreationalComment}</p>
-                            <p><strong>Recreational Percentage:</strong> {term.report.recreationalPercent}%</p>
-                        </div>
-                        <div className="term-row">
-                            <p><strong>Academic Comment:</strong> {term.academicComment}</p>
-                            <p><strong>Academic Percentage:</strong> {term.report.academicPercent}%</p>
-                        </div>
-                        <div className="term-row">
-                            <p><strong>Social Comment:</strong> {term.socialComment}</p>
-                            <p><strong>Social Percentage:</strong> {term.report.socialPercent}%</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <Footer />
         </div>
-
     );
 };
 
-
-const sampleData = {
-    regNo: '12345',
-    name: 'John Doe',
-    currYear: '2',
-    currTerm: 'I',
-    classId: 'preprimary_3',
-    yearReport: [
-        {
-            year: '3',
-            yearComment: 'Good performance overall.',
-            yearPersonalComment: 'Improved in self-management.',
-            yearOccupationalComment: 'Excellent work in practical assignments.',
-            yearRecreationalComment: 'Active participation in sports.',
-            yearAcademicComment: 'Top grades in all subjects.',
-            yearSocialComment: 'Well-behaved and cooperative.',
-            termReport: [
-                {
-                    term: 'Term 1',
-                    report: {
-                        personalPercent: 85,
-                        socialPercent: 90,
-                        academicPercent: 95,
-                        occupationalPercent: 80,
-                        recreationalPercent: 70,
-                        mode: 'A+',
-                    },
-                    termComment: 'Good start to the year.',
-                    personalComment: 'Needs to be more organized.',
-                    occupationalComment: 'Keep up the good work.',
-                    recreationalComment: 'Participates well in activities.',
-                    academicComment: 'Excellent results.',
-                    socialComment: 'Very sociable.',
-                },
-                {
-                    term: 'Term 2',
-                    report: {
-                        personalPercent: 88,
-                        socialPercent: 85,
-                        academicPercent: 92,
-                        occupationalPercent: 78,
-                        recreationalPercent: 75,
-                        mode: 'A',
-                        percent: 79,
-                    },
-                    termComment: 'Steady progress.',
-                    personalComment: 'Shows improvement in organization.',
-                    occupationalComment: 'Consistent performance.',
-                    recreationalComment: 'Engaged in sports.',
-                    academicComment: 'Very good results.',
-                    socialComment: 'Friendly and cooperative.',
-                },
-                {
-                    term: 'Term 3',
-                    report: {
-                        personalPercent: 90,
-                        socialPercent: 88,
-                        academicPercent: 94,
-                        occupationalPercent: 82,
-                        recreationalPercent: 78,
-                        mode: 'A',
-                        percent: '75',
-                    },
-                    termComment: 'Continues to excel.',
-                    personalComment: 'Very well organized.',
-                    occupationalComment: 'Great practical skills.',
-                    recreationalComment: 'Active participation.',
-                    academicComment: 'Excellent performance.',
-                    socialComment: 'Very sociable.',
-                },
-                {
-                    term: 'Term 4',
-                    report: {
-                        personalPercent: 92,
-                        socialPercent: 90,
-                        academicPercent: 96,
-                        occupationalPercent: 85,
-                        recreationalPercent: 80,
-                        mode: 'A+',
-                        percent: 90,
-                    },
-                    termComment: 'Outstanding performance.',
-                    personalComment: 'Highly organized.',
-                    occupationalComment: 'Top-notch skills.',
-                    recreationalComment: 'Very active in sports.',
-                    academicComment: 'Exceptional results.',
-                    socialComment: 'Very friendly.',
-                },
-            ],
-        },
-        {
-            year: '2',
-            yearComment: 'Excellent performance throughout the year.',
-            yearPersonalComment: 'Remarkable self-discipline.',
-            yearOccupationalComment: 'Outstanding in practical tasks.',
-            yearRecreationalComment: 'Highly involved in extracurricular activities.',
-            yearAcademicComment: 'Consistently high grades.',
-            yearSocialComment: 'Great team player.',
-            termReport: [
-                {
-                    term: 'Term 1',
-                    report: {
-                        personalPercent: 87,
-                        socialPercent: 92,
-                        academicPercent: 93,
-                        occupationalPercent: 81,
-                        recreationalPercent: 75,
-                        mode: 'A+',
-                        percent: 90,
-                    },
-                    termComment: 'Strong start.',
-                    personalComment: 'Very disciplined.',
-                    occupationalComment: 'Excellent practical skills.',
-                    recreationalComment: 'Participates actively.',
-                    academicComment: 'High achievements.',
-                    socialComment: 'Well-mannered.',
-                },
-                {
-                    term: 'Term 2',
-                    report: {
-                        personalPercent: 89,
-                        socialPercent: 90,
-                        academicPercent: 94,
-                        occupationalPercent: 83,
-                        recreationalPercent: 78,
-                        mode: 'C',
-                        percent: 60,
-                    },
-                    termComment: 'Consistent performance.',
-                    personalComment: 'Maintains discipline.',
-                    occupationalComment: 'Keeps up the good work.',
-                    recreationalComment: 'Actively participates.',
-                    academicComment: 'High achievements.',
-                    socialComment: 'Well-mannered.',
-                },
-                {
-                    term: 'Term 3',
-                    report: {
-                        personalPercent: 91,
-                        socialPercent: 88,
-                        academicPercent: 96,
-                        occupationalPercent: 85,
-                        recreationalPercent: 80,
-                        mode: 'A',
-                        percent: 84,
-                    },
-                    termComment: 'Outstanding progress.',
-                    personalComment: 'Highly organized.',
-                    occupationalComment: 'Excellent practical skills.',
-                    recreationalComment: 'Very involved.',
-                    academicComment: 'Top results.',
-                    socialComment: 'Good team player.',
-                },
-                {
-                    term: 'Term 4',
-                    report: {
-                        personalPercent: 93,
-                        socialPercent: 92,
-                        academicPercent: 98,
-                        occupationalPercent: 88,
-                        recreationalPercent: 82,
-                        mode: 'A+',
-                        percent: 91,
-                    },
-                    termComment: 'Exceptional results.',
-                    personalComment: 'Exceeds expectations.',
-                    occupationalComment: 'Top practical skills.',
-                    recreationalComment: 'Highly active.',
-                    academicComment: 'Excellent results.',
-                    socialComment: 'Very cooperative.',
-                },
-            ],
-        },
-        {
-            year: '1',
-            yearComment: 'Great academic year.',
-            yearPersonalComment: 'Very well-mannered.',
-            yearOccupationalComment: 'Good practical skills.',
-            yearRecreationalComment: 'Active in sports and clubs.',
-            yearAcademicComment: 'Achieved high grades.',
-            yearSocialComment: 'Friendly and helpful.',
-            termReport: [
-                // {
-                //   term: 'Term 1',
-                //   report: {
-                //     personalPercent: 86,
-                //     socialPercent: 89,
-                //     academicPercent: 91,
-                //     occupationalPercent: 79,
-                //     recreationalPercent: 72,
-                //     mode: 'A',
-                //     percent: 86,
-                //   },
-                //   termComment: 'Good start.',
-                //   personalComment: 'Very organized.',
-                //   occupationalComment: 'Good practical application.',
-                //   recreationalComment: 'Participates in activities.',
-                //   academicComment: 'Good results.',
-                //   socialComment: 'Very sociable.',
-                // },
-                {
-                    term: 'Term 2',
-                    report: {
-                        personalPercent: 88,
-                        socialPercent: 87,
-                        academicPercent: 93,
-                        occupationalPercent: 80,
-                        recreationalPercent: 74,
-                        mode: 'B+',
-                        percent: '72',
-                    },
-                    termComment: 'Consistent performance.',
-                    personalComment: 'Keeps organized.',
-                    occupationalComment: 'Good practical work.',
-                    recreationalComment: 'Active in sports.',
-                    academicComment: 'Very good results.',
-                    socialComment: 'Friendly and helpful.',
-                },
-                {
-                    term: 'Term 3',
-                    report: {
-                        personalPercent: 90,
-                        socialPercent: 88,
-                        academicPercent: 95,
-                        occupationalPercent: 82,
-                        recreationalPercent: 77,
-                        mode: 'A+',
-                        percent: 90,
-                    },
-                    termComment: 'Strong performance.',
-                    personalComment: 'Very disciplined.',
-                    occupationalComment: 'Shows great skills.',
-                    recreationalComment: 'Highly active.',
-                    academicComment: 'Excellent results.',
-                    socialComment: 'Very cooperative.',
-                },
-                {
-                    term: 'Term 4',
-                    report: {
-                        personalPercent: 92,
-                        socialPercent: 90,
-                        academicPercent: 97,
-                        occupationalPercent: 85,
-                        recreationalPercent: 80,
-                        mode: 'A+',
-                        percent: 89,
-                    },
-                    termComment: 'Exceptional performance.',
-                    personalComment: 'Highly organized.',
-                    occupationalComment: 'Top skills.',
-                    recreationalComment: 'Very active.',
-                    academicComment: 'Exceptional results.',
-                    socialComment: 'Very friendly.',
-                },
-            ],
-        },
-    ],
-};
-
-
-const History = () => {
-    const studentId = localStorage.getItem("studentId")
-
-    useEffect(async () => {
-        const data = await axios.get("http://localhost:4000/teacher/history", {
-            headers: {
-                id : studentId,
-                "Content-Type": "application/json",
-                authorization: `Bearer ${localStorage.getItem("token")}`,
-            }
-        },{withCredentials:true})
-        .then(res=>{
-            console.log(res)
-        })
-        .catch(err=>{
-            console.log(err)
-        })
-    })
-
-    return <StudentReport data={sampleData} />;
-};
-
-export default History;
+export default StudentPerformance;

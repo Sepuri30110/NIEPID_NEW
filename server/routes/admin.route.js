@@ -2,7 +2,6 @@ const express = require('express')
 const multer = require('multer')
 const routes = express.Router()
 const { registerStudent, registerTeacher, viewStudent, viewTeacher, downloadExcel, editTeacher } = require('../controllers/admin.controller')
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage })
 

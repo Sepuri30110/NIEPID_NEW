@@ -38,6 +38,9 @@ function App() {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 },
             })
+            .catch(err=>{
+                console.log(err.response)
+            })
 
             if (response) {
                 navigate('/admin');

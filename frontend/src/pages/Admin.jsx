@@ -31,16 +31,16 @@ function App() {
 
             const formData = new FormData();
             formData.append('file', selectedFile);
-            console.log(formData)
+            //console.log(formData)
             let response = await axios.post('http://localhost:4000/admin/registerTeacher', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 },
             })
-            .catch(err=>{
-                console.log(err.response)
-            })
+                .catch(err => {
+                    //console.log(err.response)
+                })
 
             if (response) {
                 navigate('/admin');
@@ -55,8 +55,8 @@ function App() {
 
     const handleDownloadTeachers = async () => {
         try {
-            console.log("Attempting to download file");
-            console.log(`Bearer ${localStorage.getItem("token")}`);
+            //console.log("Attempting to download file");
+            //console.log(`Bearer ${localStorage.getItem("token")}`);
 
             const response = await axios.get('http://localhost:4000/admin/download', {
                 headers: {

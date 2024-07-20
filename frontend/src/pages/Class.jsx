@@ -13,7 +13,7 @@ function Class() {
   const [UInfo, setUInfo] = useState(null);
 
   useEffect(() => {
-    
+
 
     const verifyUser = async () => {
       if (!cookies.jwt) {
@@ -38,13 +38,13 @@ function Class() {
   }, [cookies, navigate, removeCookie]);
 
   useEffect(() => {
-    
+
     getDetails();
   }, []);
   async function getDetails() {
     try {
       await axios
-        .post("http://localhost:4000/getassignedstudents",{},{
+        .post("http://localhost:4000/getassignedstudents", {}, {
           withCredentials: true,
         })
         .then((response) => {
@@ -83,7 +83,7 @@ function Class() {
           withCredentials: true,
         }
       );
-      console.log(response);
+      //console.log(response);
 
       if (!response.success) {
         toast.error(response.message);

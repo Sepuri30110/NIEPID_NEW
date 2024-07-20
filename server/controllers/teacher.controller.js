@@ -17,7 +17,7 @@ const submitYearTypeComment = async (req, res) => {
     const student = await studentModel.findOne({ regNo: id })
     const section = student.section.find(sec => sec.sec === req.body.section)
     const yearReport = section.yearReport.find(year => year.year === req.body.year)
-    // console.log(req.body)
+    //console.log(req.body)
     yearReport.comment.yearComment = req.body.comments[0]
     yearReport.comment.yearPersonalComment = req.body.comments[1]
     yearReport.comment.yearOccupationalComment = req.body.comments[2]
@@ -29,7 +29,7 @@ const submitYearTypeComment = async (req, res) => {
     res.status(200).json("Success")
     // }
     // catch (err) {
-    //     console.log(err)
+    //     //console.log(err)
     //     res.status(400).send(false)
     // }
 }
@@ -77,20 +77,20 @@ const evaluateYearStudent = async (req, res) => {
         res.status(200).json("Success")
     }
     catch (err) {
-        console.log(err)
+        //console.log(err)
         res.status(400).send(false)
     }
 }
 
 const evaluateStudent = async (req, res) => {
     // try {
-    const id = req.headers.id
+    const regNo = req.headers.id
     // console.log(req.headers)
-    const student = await studentModel.findOne({ regNo: id })
+    const student = await studentModel.findOne({ regNo: regNo })
     const section = student.section.find(sec => sec.sec === req.headers.section)
     const yearReport = section.yearReport.find(year => year.year === req.headers.year)
     const termReport = yearReport.termReport.find(term => term.term === req.headers.term)
-    console.log(termReport)
+    //console.log(termReport)
     let questions;
     if (req.headers.type === "personalQA")
         questions = termReport.report.personalQA
@@ -104,7 +104,7 @@ const evaluateStudent = async (req, res) => {
         questions = termReport.report.occupationalQA
 
     let result
-    // console.log(questions)
+    //console.log(questions)
     if (req.headers.type !== "recreationalQA") {
         result = findPercent(questions)
         if (req.headers.type === "personalQA") {
@@ -299,8 +299,8 @@ const evaluateStudent = async (req, res) => {
             }
 
             const result = (parseFloat(personalPercent) + parseFloat(socialPercent) + parseFloat(academicPercent) + parseFloat(occupationalPercent)) / 4;
-            //console.log(typeof(parseFloat(personalPercent)),typeof(socialPercent),typeof(academicPercent),typeof(occupationalPercent))
-            console.log(result)
+            //console.log(typeof (parseFloat(personalPercent)), typeof (socialPercent), typeof (academicPercent), typeof (occupationalPercent))
+            //console.log(result)
             if (result >= 80 && yearReport.year === student.currYear && section.sec === student.currSection) {
                 section.status = "pass"
                 //create new Section
@@ -343,8 +343,8 @@ const evaluateStudent = async (req, res) => {
             }
             else {
                 // //trying to evaluate previous evaluated year/section
-                // console.log(yearReport.year,section.sec)
-                // console.log(student.currYear,student.currSection)
+                //console.log(yearReport.year, section.sec)
+                //console.log(student.currYear, student.currSection)
                 // res.status(201).json("Not allowed to evaluate previous year/section once evaluated")
             }
         }
@@ -354,7 +354,7 @@ const evaluateStudent = async (req, res) => {
     res.status(200).json({ result })
     // }
     // catch (err) {
-    //     console.log(err)
+    //     //console.log(err)
     //     res.status(400).send(false)
     // }
 }
@@ -369,7 +369,7 @@ const findPercent = (arr) => {
             continue
         count++
     }
-    // console.log(ans,count)
+    //console.log(ans, count)
     if (ans != 0 && count != 0)
         return ((ans / count) * 100).toFixed(2)
     return 0;
@@ -412,7 +412,7 @@ const historyStudent = async (req, res) => {//expecting student details form req
     try {
         const regNo_request = req.headers.id
         const std = await studentModel.findOne({ "regNo": regNo_request })
-        // console.log(std)
+        //console.log(std)
         if (!std) {
             res.status(203).json({ message: "stdent doesnt exists" })
         }
@@ -420,33 +420,33 @@ const historyStudent = async (req, res) => {//expecting student details form req
             res.status(202).json({ data: "Year not completed" });
         }
         else {
-            // console.log(std)
+            //console.log(std)
             res.status(200).json(std)
         }
     }
     catch (error) {
-        console.log(error)
+        //console.log(error)
         res.status(404).send(false)
     }
 }
 
 const getStudents = async (req, res) => {
     try {
-        // console.log("Hiii")
+        //console.log("Hiii")
         const id = req.headers.id
-        // console.log(req.headers.id)
+        //console.log(req.headers.id)
         const teacher = await teacherModel.findOne({ "teacherId": id })
-        // console.log(teacher)
+        //console.log(teacher)
         const students = []
         if (teacher) {
             for (let index = 0; index < teacher.classId.length; index++) {
                 const classId = teacher.classId[index];
-                // console.log("-------------------------------",classId)
+                //console.log("-------------------------------", classId)
                 const students_classId = await studentModel.find({ classId: classId })
                 if (!students_classId.length == 0)
                     students.push(students_classId)
-                // console.log(students_classId)
-                // console.log("--------------------------------")
+                //console.log(students_classId)
+                //console.log("--------------------------------")
             }
             if (students) {
                 res.status(200).json({ students })
@@ -460,7 +460,7 @@ const getStudents = async (req, res) => {
         }
     }
     catch (error) {
-        // console.log(error)
+        //console.log(error)
         res.status(404).send(false)
     }
 
@@ -473,10 +473,10 @@ const getQuestions = async (req, res) => {
     try {
         const id = req.headers.id
         // const id = "S000"
-        // console.log(id)
+        //console.log(id)
         const student = await studentModel.findOne({ "regNo": id })
         if (student) {
-            // console.log(student)
+            //console.log(student)
             res.json({ status: "success", data: student })
         }
         else {
@@ -491,10 +491,10 @@ const getQuestions = async (req, res) => {
 const getTeacher = async (req, res) => {
     try {
         const id = req.headers.id
-        // console.log(id)
+        //console.log(id)
         const teacher = await teacherModel.findOne({ "teacherId": id })
         if (teacher) {
-            // console.log(student)
+            //console.log(student)
             res.json({ status: "success", data: teacher })
         }
         else {
@@ -508,14 +508,14 @@ const getTeacher = async (req, res) => {
 
 const submitForm = async (req, res) => {
     try {
-        // console.log(req.body)
+        //console.log(req.body)
         const id = req.body.id
         const type = req.body.type
         const data = req.body.data
         // const year = req.body.year
         // const section = req.body.section
         // const term = req.body.term
-        // console.log(data)
+        //console.log(data)
         const std = await studentModel.findOne({
             regNo: id,
         })
@@ -535,7 +535,7 @@ const submitForm = async (req, res) => {
         else if (type === "occupationalQA")
             termReport.report.occupationalQA = data.questions
 
-        // console.log(termReport.report.personalQA)
+        //console.log(termReport.report.personalQA)
         std.save()
         {
             // let i=0,j=0,k=0;
@@ -571,7 +571,7 @@ const submitForm = async (req, res) => {
             //     std.section[k].yearReport[i].termReport[k].report.socialQA = data.questions
             // else if(type === "occupationalQA")
             //     std.section[k].yearReport[i].termReport[k].report.occupationalQA = data.questions
-            // console.log(std.section[k].yearReport[i].termReport[j].report.personalQA)
+            //console.log(std.section[k].yearReport[i].termReport[j].report.personalQA)
             // const stud = await studentModel.findOneAndUpdate({
             //     regNo:id,
             //     section:std.section
@@ -581,7 +581,7 @@ const submitForm = async (req, res) => {
         res.json({ data: std })
     }
     catch (error) {
-        // console.log("-----------------")
+        //console.log("-----------------")
         res.status(400).send(false)
     }
 }
@@ -591,56 +591,56 @@ const getStudentbyId = async (req, res) => {
         const data = req.headers.id
         const std = await studentModel.findOne({ regNo: data })
         if (!std) {
-            // console.log('stdent not found')
+            //console.log('stdent not found')
             res.status("Bad request").json({ message: "invalid regNo" })
         }
         else {
-            // console.log("-------------------------------", std, "------------------------------------")
+            //console.log("-------------------------------", std, "------------------------------------")
             res.json(std)
         }
     } catch (err) {
-        // console.log(err)
+        //console.log(err)
         res.status(500).json({ message: "internal server error" })
     }
 }
 
 const submitTermTypeComment = async (req, res) => {
     try {
-    const id = req.body.id
-    let flag = true
-    // console.log(req.body)
-    const student = await studentModel.findOne({ regNo: id })
-    const section = student.section.find(sec => sec.sec === req.body.section)
-    const yearReport = section.yearReport.find(year => year.year === req.body.year)
-    const termReport = yearReport.termReport.find(term => term.term === req.body.term)
+        const id = req.body.id
+        let flag = true
+        //console.log(req.body)
+        const student = await studentModel.findOne({ regNo: id })
+        const section = student.section.find(sec => sec.sec === req.body.section)
+        const yearReport = section.yearReport.find(year => year.year === req.body.year)
+        const termReport = yearReport.termReport.find(term => term.term === req.body.term)
 
-    if (req.body.type === "personalQA")
-        termReport.comment.personalComment = req.body.comments
-    else if (req.body.type === "socialQA")
-        termReport.comment.socialComment = req.body.comments
-    else if (req.body.type === "academicQA")
-        termReport.comment.academicComment = req.body.comments
-    else if (req.body.type === "recreationalQA")
-        termReport.comment.recreationalComment = req.body.comments
-    else if (req.body.type === "occupationalQA")
-        termReport.comment.occupationalComment = req.body.comments
-    else if (termReport.comment.personalComment && termReport.comment.socialComment && termReport.comment.academicComment && termReport.comment.occupationalComment && termReport.comment.recreationalComment) {
-        // console.log("-------")
-        termReport.comment.termComment = req.body.comments
-    }
-    else {
-        flag = false
-        res.status(201).json("no comments updated")
-    }
+        if (req.body.type === "personalQA")
+            termReport.comment.personalComment = req.body.comments
+        else if (req.body.type === "socialQA")
+            termReport.comment.socialComment = req.body.comments
+        else if (req.body.type === "academicQA")
+            termReport.comment.academicComment = req.body.comments
+        else if (req.body.type === "recreationalQA")
+            termReport.comment.recreationalComment = req.body.comments
+        else if (req.body.type === "occupationalQA")
+            termReport.comment.occupationalComment = req.body.comments
+        else if (termReport.comment.personalComment && termReport.comment.socialComment && termReport.comment.academicComment && termReport.comment.occupationalComment && termReport.comment.recreationalComment) {
+            //console.log("-------")
+            termReport.comment.termComment = req.body.comments
+        }
+        else {
+            flag = false
+            res.status(201).json("no comments updated")
+        }
 
-    // console.log(termReport.comment.termComment)
-    // console.log(termReport)
-    if (flag) {
-        student.save()
-        res.status(200).json("Success")
-    }
+        //console.log(termReport.comment.termComment)
+        //console.log(termReport)
+        if (flag) {
+            student.save()
+            res.status(200).json("Success")
+        }
     } catch (err) {
-        // console.log(err)
+        //console.log(err)
         res.status(400).send(false)
     }
 }

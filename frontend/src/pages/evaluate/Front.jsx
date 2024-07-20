@@ -66,7 +66,7 @@ const Front = () => {
         else
           setOldComments("Enter your comments")
 
-        // console.log(res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
+        //console.log(res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
         if (res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
           setPersonalPercent(res.data.data.section[k].yearReport[i].termReport[j].percent.personalPercent)
         else
@@ -97,10 +97,10 @@ const Front = () => {
         else
           setMode("")
 
-        // console.log(res)
+        //console.log(res)
       })
       .catch(err => {
-        console.log(err)
+        //console.log(err)
       })
   })
 
@@ -119,10 +119,10 @@ const Front = () => {
       }
     })
       .then(res => {
-        console.log(res.data)
+        //console.log(res.data)
       })
       .catch(err => {
-        console.log(err.response)
+        //console.log(err.response)
       })
   }
 

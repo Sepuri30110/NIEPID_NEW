@@ -192,10 +192,10 @@ const Recreational = () => {
     // const year = "2023"
 
     useEffect(async () => {
-        // console.log(term, currTerm)
-        // console.log(year, currYear)
-        // console.log(section, currSection)
-        // console.log(id)
+        //console.log(term, currTerm)
+        //console.log(year, currYear)
+        //console.log(section, currSection)
+        //console.log(id)
         const data = await axios.get("http://localhost:4000/teacher/evaluate/questions", {
             headers: {
                 id: id,
@@ -204,7 +204,7 @@ const Recreational = () => {
             }
         }, { withCredentials: true })
             .then(res => {
-                // console.log(res)
+                //console.log(res)
                 username = res.data.data.name
                 var i = 0, j = 0, k = 0;
                 res.data.data.section.map((s, index) => {
@@ -265,7 +265,7 @@ const Recreational = () => {
         });
         setNewQuestion("");
         setNewAnswer("");
-        // console.log(answer)
+        //console.log(answer)
     };
 
     const handleEvaluate = async (event) => {
@@ -277,7 +277,7 @@ const Recreational = () => {
                 answer: answer[`s${index + 1}`] || question.answer
             }))
         };
-        // console.log('Submitting data:', submissionData);
+        //console.log('Submitting data:', submissionData);
         const id = localStorage.getItem("studentId")
         await axios.post("http://localhost:4000/teacher/eval/form", {
             type: "recreationalQA",
@@ -293,10 +293,10 @@ const Recreational = () => {
             }
         })
             .then(res => {
-                // console.log(res.data.data)
+                //console.log(res.data.data)
             })
             .catch(err => {
-                console.log(err.response)
+                //console.log(err.response)
             })
 
         axios.get("http://localhost:4000/teacher/evaluate", {
@@ -311,7 +311,7 @@ const Recreational = () => {
             }
         })
             .then((res) => {
-                console.log(res.data)
+                //console.log(res.data)
                 const result = {
                     mode: res.data.result.mode,
                     percent: res.data.result.percent
@@ -319,7 +319,7 @@ const Recreational = () => {
                 setResult(result)
             })
             .catch((err) => {
-                console.log(err)
+                //console.log(err)
             })
 
         const commentsElements = document.getElementsByName("comments");
@@ -353,10 +353,10 @@ const Recreational = () => {
             }
         })
             .then((res) => {
-                console.log(res.data)
+                //console.log(res.data)
             })
             .catch((err) => {
-                console.log(err.response)
+                //console.log(err.response)
             })
     }
 

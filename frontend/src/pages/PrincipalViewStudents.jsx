@@ -57,7 +57,7 @@ const PrincipalViewStudents = () => {
     const fetchStudentDetails = async () => {
         setLoading(true);
         try {
-            // console.log(searchValues)
+            //console.log(searchValues)
             const { regno, name, curryear, currterm, classid } = searchValues;
             const response = await axios.get('http://localhost:4000/principle/student/search', {
                 headers: {

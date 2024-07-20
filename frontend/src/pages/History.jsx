@@ -87,22 +87,21 @@ const StudentPerformance = () => {
                 Authorization: `Bearer ${localStorage.getItem("token")}`
             }
         })
-        .then(res=>{
-            console.log(res)
-            if(res.status != 200)
-            {
-                toast.error("Student is still in 1st Year", {
-                    position: "top-right",
-                  });
-                navigate('/teacher')
-            }
-            setStudentInfo(res.data)
+            .then(res => {
+                //console.log(res)
+                if (res.status != 200) {
+                    toast.error("Student is still in 1st Year", {
+                        position: "top-right",
+                    });
+                    navigate('/teacher')
+                }
+                setStudentInfo(res.data)
 
-        })
-        .catch(err=>{
-            console.log(err.response)
-        })
-    },[])
+            })
+            .catch(err => {
+                //console.log(err.response)
+            })
+    }, [])
 
     const [studentInfo, setStudentInfo] = useState({
         name: "rohanKrishna",
@@ -323,7 +322,7 @@ const StudentPerformance = () => {
 
     const selectedSectionData = studentInfo.section.find(section => section.sec === selectedSection);
     const selectedYearData = selectedSectionData.yearReport.find(year => year.year === selectedYear);
-    console.log(studentInfo)
+    //console.log(studentInfo)
 
     const chartData = {
         labels: ['Personal', 'Social', 'Academic', 'Occupational', 'Recreational'],

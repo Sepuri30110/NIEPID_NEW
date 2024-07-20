@@ -333,7 +333,7 @@ const findQAs = (v1) => {
         { question: "Plays on a slide", answer: "" },
         { question: "Swings on a swing", answer: "" }]
     }
-    // console.log(ans)
+    //console.log(ans)
     return ans
 }
 

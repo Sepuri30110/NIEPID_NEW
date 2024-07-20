@@ -20,8 +20,8 @@ import Social from "./pages/evaluate/Social";
 import Recreational from "./pages/evaluate/Recreational";
 import Occupational from "./pages/evaluate/Occupational";
 import Academic from "./pages/evaluate/Academic";
-import Term from "./pages/Term";
-import TermEntry from "./pages/TermEntry";
+import Term from "./pages/evaluate/Term";
+import TermEntry from "./pages/evaluate/TermEntry";
 
 
 import "react-toastify/dist/ReactToastify.css";

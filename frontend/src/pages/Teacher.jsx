@@ -23,9 +23,9 @@ export default function Home() {
     localStorage.removeItem("year")
     localStorage.removeItem("term")
     localStorage.removeItem("studentId")
-    
+
     const teacherId = localStorage.getItem("userId")
-    console.log("hiiii")
+    //console.log("hiiii")
     axios.get('http://localhost:4000/teacher/getStudents', {
       headers: {
         id: teacherId,
@@ -33,19 +33,19 @@ export default function Home() {
         "Content-Type": "application/json",
         authorization: `Bearer ${localStorage.getItem("token")}`,
       }
-    }, { withCredentials: true }) 
+    }, { withCredentials: true })
       .then(res => {
-        console.log(res.data.students)
+        //console.log(res.data.students)
         setStudents(res.data.students)
-        
+
       })
-      .catch(err=>{
-        console.log(err.response)
+      .catch(err => {
+        //console.log(err.response)
       })
 
 
     // setStudents(groupedStudents);
-    // console.log(students)
+    //console.log(students)
 
     axios.get('http://localhost:4000/teacher/getTeacher', {
       headers: {
@@ -56,11 +56,11 @@ export default function Home() {
       }
     }, { withCredentials: true })
       .then((res) => {
-        // console.log(res)
+        //console.log(res)
         setTeacher(res.data.data)
       })
       .catch(err => {
-        console.log("Error", err)
+        //console.log("Error", err)
       })
 
   }, []);

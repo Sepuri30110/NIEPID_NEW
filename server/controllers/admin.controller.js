@@ -38,44 +38,43 @@ const registerStudent = async (req, res) => {
     try {
         const val1 = {}
         const data = req.body
-        // console.log(data.formData.details.info.regNo)
-        // console.log(data.formData.details.info)
-        const arr1 = await studentDetailsModel.findOne({'info.regNo':data.formData.details.info.regNo})
-        const arr2 = await studentModel.findOne({regNo:data.formData.details.info.regNo})
-        // console.log("hello")
-        // console.log(arr1.length)
-        // console.log(arr1+"  "+arr2+" "+"hello")
-        lable1: if (!arr1 && !arr2){
+        //console.log(data.formData.details.info.regNo)
+        //console.log(data.formData.details.info)
+        const arr1 = await studentDetailsModel.findOne({ 'info.regNo': data.formData.details.info.regNo })
+        const arr2 = await studentModel.findOne({ regNo: data.formData.details.info.regNo })
+        //console.log("hello")
+        //console.log(arr1.length)
+        //console.log(arr1 + "  " + arr2 + " " + "hello")
+        lable1: if (!arr1 && !arr2) {
             let flag = false
-            // console.log('namaste')
-            // console.log(data.formData.details)
-            if(data.formData.details.info.regNo)
-            {
-            const responce1 = await new studentDetailsModel(data.formData.details).save()
-                .then(() => {
-                    console.log("data entered in studentDetailsModel successfully")
-                })
-                .catch((err) => {
-                    // console.log(err)
-                    flag = true
-                })
+            //console.log('namaste')
+            //console.log(data.formData.details)
+            if (data.formData.details.info.regNo) {
+                const responce1 = await new studentDetailsModel(data.formData.details).save()
+                    .then(() => {
+                        //console.log("data entered in studentDetailsModel successfully")
+                    })
+                    .catch((err) => {
+                        //console.log(err)
+                        flag = true
+                    })
             }
             if (flag) {
                 res.status(405).json({ reason: "studentDetails already exists" })
                 break lable1
             }
             const value1 = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
-            // console.log(value1)
+            //console.log(value1)
             const arr3 = await classModel.findOne({ classId: value1 })
-            // console.log(arr3.length)
-            // console.log(arr3)
+            //console.log(arr3.length)
+            //console.log(arr3)
             if (!arr3) {
                 res.status(404).json({ reason: "no class exists" })
                 break lable1
-            } else{
+            } else {
                 const v1 = arr3.student
                 v1.push(data.formData.details.info.regNo)
-                // console.log(v1)
+                //console.log(v1)
                 const searchClass = generateClassId(data.formData.stdCred.section, data.formData.stdCred.year)
                 const responce2 = await classModel.findOneAndUpdate(
                     { classId: searchClass },
@@ -83,15 +82,15 @@ const registerStudent = async (req, res) => {
                     { new: true }
                 )
                 const ans = studentJsonGenerate(data, searchClass)
-                // console.log(ans)
+                //console.log(ans)
                 const responce3 = await new studentModel(ans).save()
                     .then(() => {
-                        // console.log("student has been saved")
+                        //console.log("student has been saved")
                     })
                     .catch((err) => {
-                        // console.log("student has not been saved \n"+err)
+                        //console.log("student has not been saved \n" + err)
                         flag = true
-                        // console.log(ans)
+                        //console.log(ans)
                     })
                 if (flag) {
                     res.status(403).json({ reason: "student already exists" })
@@ -104,12 +103,12 @@ const registerStudent = async (req, res) => {
                 }
                 const responce4 = await new userModel(stdUser).save()
                     .then(() => {
-                        console.log("student has been saved in userDB")
+                        //console.log("student has been saved in userDB")
                     })
                     .catch((err) => {
-                        console.log("student has not been saved in userDB \n"+err)
+                        //console.log("student has not been saved in userDB \n" + err)
                         flag = true
-                        console.log(ans)
+                        //console.log(ans)
                     })
                 if (flag) {
                     res.status(402).json({ reason: "student already exists" })
@@ -118,27 +117,27 @@ const registerStudent = async (req, res) => {
             }
         }
         else {
-            // console.log(arr1)
-            // console.log(arr2)
+            //console.log(arr1)
+            //console.log(arr2)
             res.status(401).json({ failure: "true" })
         }
     }
     catch (error) {
-        console.log(error)
+        //console.log(error)
         res.status(404).send(false)
     }
 }
 
 const registerTeacher = async (req, res) => {
     try {
-        // console.log('File buffer:', req.file.buffer);
+        //console.log('File buffer:', req.file.buffer);
         const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
-        // console.log('Workbook:', workbook);
+        //console.log('Workbook:', workbook);
 
         const sheetName = workbook.SheetNames[0];
-        // console.log("sheetnames:", workbook.Sheets[sheetName])
+        //console.log("sheetnames:", workbook.Sheets[sheetName])
         const worksheet = workbook.Sheets[sheetName];
-        // console.log("worksheet:", worksheet)
+        //console.log("worksheet:", worksheet)
         const headers = ['teacherId', 'teacherName', 'teacherMNo', 'email', 'classId'];
 
         const data1 = xlsx.utils.sheet_to_json(worksheet, {
@@ -147,7 +146,7 @@ const registerTeacher = async (req, res) => {
             range: 0
         });
         const data = data1.slice(1)
-        console.log('Extracted data:', data);
+        //console.log('Extracted data:', data);
 
         const newData = data.map(async (row) => {
             const teacher = {
@@ -170,7 +169,7 @@ const registerTeacher = async (req, res) => {
 
             await teacherModel.create(teacher)
 
-            // console.log(typeof(row.classId))
+            //console.log(typeof (row.classId))
 
             const user = {
                 id: row.teacherId,
@@ -180,7 +179,7 @@ const registerTeacher = async (req, res) => {
             await userModel.create(user)
         })
 
-        // console.log(newData)
+        //console.log(newData)
         res.json({ success: true });
     }
     catch (error) {
@@ -192,7 +191,7 @@ const registerTeacher = async (req, res) => {
 const viewStudent = async (req, res) => {
     try {
         const students = await studentModel.find({})
-        // console.log(students)
+        //console.log(students)
         if (students) {
             res.status(200).json({ status: "success", data: students })
         }
@@ -208,7 +207,7 @@ const viewStudent = async (req, res) => {
 const viewTeacher = async (req, res) => {
     try {
         const teachers = await teacherModel.find({})
-        console.log(teachers)
+        //console.log(teachers)
         if (teachers) {
             res.status(200).json({ status: "success", data: teachers })
         }
@@ -222,9 +221,9 @@ const viewTeacher = async (req, res) => {
 }
 
 const downloadExcel = async (req, res) => {
-    console.log("hii")
+    //console.log("hii")
     const file = await path.join(__dirname, '..', 'samplesheets', 'sampleDataTeacher.xlsx'); // Adjust the path to your file
-    console.log("File path:", file); // Log the file path for debugging
+    //console.log("File path:", file); // Log the file path for debugging
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); // Set the CORS header for this route
     res.download(file, (err) => {
         if (err) {

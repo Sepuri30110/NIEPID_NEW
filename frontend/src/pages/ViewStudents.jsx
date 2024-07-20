@@ -1,13 +1,31 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 // Sample data
-const studentDetails = [
+const stu = [
     { id: 1, name: 's1', year: '2nd', section: 'A' },
     { id: 2, name: 's2', year: '3rd', section: 'B' },
     { id: 3, name: 's3', year: '1st', section: 'C' },
 ];
 
 const StudentTable = () => {
+    const [studentDetails, setStudentDetails] = useState({})
+
+    useEffect(async () => {
+        const data = await axios.get('http://localhost:4000/admin/viewStudent', {
+            headers: {
+                'Content-Type': 'application/json',
+                authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        })
+            .then(res => {
+                console.log(res.data.data)
+                setStudentDetails(res.data.data)
+            })
+            .catch(err => {
+                console.log(err.response)
+            })
+    }, [])
     return (
         <div style={styles.container}>
             <h1 style={styles.heading}>Student Details</h1>
@@ -20,12 +38,14 @@ const StudentTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {studentDetails.map((student, index) => (
-                        <tr key={student.id} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
-                            <td style={styles.td}>{student.id}</td>
-                            <td style={styles.td}>{student.name}</td>
-                            <td style={styles.td}>{student.year}</td>
-                            <td style={styles.td}>{student.section}</td>
+                    {
+                    
+                    Object.keys(studentDetails).map((index) => (
+                        <tr key={studentDetails[index].regNo} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
+                            <td style={styles.td}>{studentDetails[index].regNo}</td>
+                            <td style={styles.td}>{studentDetails[index].name}</td>
+                            <td style={styles.td}>{studentDetails[index].currYear}</td>
+                            <td style={styles.td}>{studentDetails[index].currSection}</td>
                         </tr>
                     ))}
                 </tbody>

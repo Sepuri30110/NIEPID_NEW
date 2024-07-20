@@ -23,15 +23,19 @@ const TeacherTable = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     authorization: `Bearer ${localStorage.getItem("token")}`
-                }},
-                {withCredentials: true
-            }) : await axios.get('http://localhost:4000/principle/viewTeacher', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    authorization: `Bearer ${localStorage.getItem("token")}`
-                }},
-                {withCredentials: true
-            })
+                }
+            },
+                {
+                    withCredentials: true
+                }) : await axios.get('http://localhost:4000/principle/viewTeacher', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                },
+                    {
+                        withCredentials: true
+                    })
             setTeacherDetails(response.data.data);
         } catch (error) {
             console.error('Error fetching teacher details:', error.message);
@@ -62,8 +66,10 @@ const TeacherTable = () => {
                     headers: {
                         'Content-Type': 'application/json',
                         authorization: `Bearer ${localStorage.getItem("token")}`
-                    }},
-                {withCredentials: true
+                    }
+                },
+                {
+                    withCredentials: true
                 }
             );
 

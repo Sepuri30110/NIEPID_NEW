@@ -61,7 +61,7 @@ const Front = () => {
                 const data = res.data;
                 const sectionData = data.section.find(s => s.sec === section);
                 const yearData = sectionData.yearReport.find(y => y.year === year);
-                console.log(yearData)
+                //console.log(yearData)
 
                 if (yearData.termReport.length == 4) {
                     if (yearData.termReport[3].evaluated.personal)
@@ -86,11 +86,11 @@ const Front = () => {
                 setoldYearOccupationalComment(yearData.comment.yearOccupationalComment)
                 setoldYearRecreationalComment(yearData.comment.yearRecreationalComment)
 
-                console.log(t)
+                //console.log(t)
                 setTerms(t)
 
             } catch (err) {
-                console.log(err);
+                //console.log(err);
             }
         };
         fetchData();
@@ -114,10 +114,10 @@ const Front = () => {
                 },
             })
                 .then(res => {
-                    console.log(res.data)
+                    //console.log(res.data)
                 })
         } catch (err) {
-            console.log(err.response);
+            //console.log(err.response);
         }
     };
 
@@ -149,9 +149,9 @@ const Front = () => {
             {/* <label style={{alignSelf:'center',fontSize:'35px',fontFamily:'cursive',fontWeight:'bold'}}>{(percent.personalPercent + percent.academicPercent + percent.occupationalPercent + percent.socialPercent)/4 > 80 ? "Pass" : "Fail"}</label>
             <br/> */}
             <div style={styles.box}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <label>Enter your comments for Year</label>
-                    <label>Year Percent : {(percent.personalPercent + percent.academicPercent + percent.occupationalPercent + percent.socialPercent)/4}</label>
+                    <label>Year Percent : {((percent.personalPercent + percent.academicPercent + percent.occupationalPercent + percent.socialPercent) / 4).toFixed(2)}</label>
                 </div>
                 <textarea
                     name="comments1"

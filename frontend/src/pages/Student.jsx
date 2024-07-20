@@ -44,7 +44,7 @@ function Student() {
     };
 
     const handleLogout = () => {
-        console.log('Logout logic here');
+        //console.log('Logout logic here');
     };
 
     return (

@@ -4,7 +4,7 @@ const studentModel = require('../models/student.model')
 const viewTeacher = async (req, res) => {
     try {
         const teachers = await teacherModel.find({})
-        console.log(teachers)
+        //console.log(teachers)
         if (teachers) {
             res.status(200).json({ status: "success", data: teachers })
         }
@@ -36,7 +36,7 @@ const getTeacher = async (req, res) => {
 const searchStudent = async (req, res) => {
     // try {
     const { regno, name, curryear, currterm, classid } = req.query;
-    // console.log(req.query)
+    //console.log(req.query)
 
     // Build the query object based on the provided filters
     const query = {};
@@ -46,7 +46,7 @@ const searchStudent = async (req, res) => {
     if (currterm) query.currTerm = new RegExp(currterm, 'i');
     if (classid) query.classId = new RegExp(classid, 'i');
 
-    console.log(query)
+    //console.log(query)
     const students = await studentModel.find(query);
     res.json({ data: students });
     // } 
@@ -55,7 +55,7 @@ const searchStudent = async (req, res) => {
 
 const viewStudent = async (req, res) => {
     try {
-        console.log("---------")
+        //console.log("---------")
         const students = await studentModel.find({});
         if (students.length) {
             res.status(200).json({ status: "success", data: students });

@@ -432,10 +432,10 @@ function AddStudents() {
 
                     })
                     .catch(err => {
-                        console.log(err.response)
+                        //console.log(err.response)
                     })
-                console.log("success");
-                // console.log(formData);
+                //console.log("success");
+                //console.log(formData);
                 // setFormData({
                 //     details: {
                 //         info: initialInfo,
@@ -446,17 +446,17 @@ function AddStudents() {
                 //     },
                 //     stdCred: initialStdCred,
                 // });
-                // console.log("Form reset:", formData);
+                //console.log("Form reset:", formData);
                 // navigate("/admin");
             } catch (err) {
                 console.error(err);
-                console.log(formData);
+                //console.log(formData);
             }
         }
     };
 
     // useEffect(() => {
-    //     console.log(formData);
+    //     //console.log(formData);
     // }, [formData]);
 
     return (

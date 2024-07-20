@@ -181,11 +181,11 @@ const Social = () => {
     // const year = "2023"
 
     useEffect(async () => {
-        console.log(term, currTerm)
-        console.log(year, currYear)
-        console.log(section, currSection)
+        //console.log(term, currTerm)
+        //console.log(year, currYear)
+        //console.log(section, currSection)
         const id = localStorage.getItem("studentId")
-        console.log(id)
+        //console.log(id)
         const data = await axios.get("http://localhost:4000/teacher/evaluate/questions", {
             headers: {
                 id: id,
@@ -194,7 +194,7 @@ const Social = () => {
             }
         }, { withCredentials: true })
             .then(res => {
-                // console.log(res)
+                //console.log(res)
                 username = res.data.data.name
                 var i = 0, j = 0, k = 0;
                 res.data.data.section.map((s, index) => {
@@ -255,7 +255,7 @@ const Social = () => {
         });
         setNewQuestion("");
         setNewAnswer("");
-        // console.log(answer)
+        //console.log(answer)
     };
 
     const handleEvaluate = async (event) => {
@@ -267,7 +267,7 @@ const Social = () => {
                 answer: answer[`s${index + 1}`] || question.answer
             }))
         };
-        // console.log('Submitting data:', submissionData);
+        //console.log('Submitting data:', submissionData);
         const id = localStorage.getItem("studentId")
         await axios.post("http://localhost:4000/teacher/eval/form", {
             type: "socialQA",
@@ -284,10 +284,10 @@ const Social = () => {
             }
         })
             .then(res => {
-                console.log(res.data.data)
+                //console.log(res.data.data)
             })
             .catch(err => {
-                console.log(err.response)
+                //console.log(err.response)
             })
 
         axios.get("http://localhost:4000/teacher/evaluate", {
@@ -302,12 +302,12 @@ const Social = () => {
             }
         })
             .then((res) => {
-                console.log(res.data)
+                //console.log(res.data)
                 const per = res.data.result
                 setPercent(per)
             })
             .catch((err) => {
-                console.log(err)
+                //console.log(err)
             })
         const commentsElements = document.getElementsByName("comments");
         commentsElements.forEach((element) => {
@@ -339,10 +339,10 @@ const Social = () => {
             }
         })
             .then((res) => {
-                console.log(res.data)
+                //console.log(res.data)
             })
             .catch((err) => {
-                console.log(err.response)
+                //console.log(err.response)
             })
     }
 

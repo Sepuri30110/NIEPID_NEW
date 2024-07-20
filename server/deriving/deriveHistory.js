@@ -13,14 +13,14 @@ const findPercent = (arr) => {
     return ((ans / count) * 100)
 }
 const findPercentForRecreational = (arr) => {
-    console.log("---------------------------------")
-    console.log(arr)
+    //console.log("---------------------------------")
+    //console.log(arr)
     var count_A = 0
     var count_B = 0
     var count_C = 0
     var count_D = 0
     var count_E = 0
-    for (let i = 0;i< arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
         if (arr[i].answer == "A") count_A++
         else if (arr[i].answer == "B") count_B++
         else if (arr[i].answer == "C") count_C++
@@ -40,13 +40,13 @@ const findPercentForRecreational = (arr) => {
         ans = "D"
     else if (val === count_E)
         ans = "E"
-    if(val !== 0)
+    if (val !== 0)
         score = (val / arr.length) * 100
-    console.log(score)
+    //console.log(score)
     return {
         mode: ans,
         precent: score
-    }   
+    }
 }
 
 const deriveHistory = (std) => {
@@ -66,7 +66,7 @@ const deriveHistory = (std) => {
             delete ans.reports[i].termReport[j].report.recreationalQA
         }
     }
-    // console.log(ans.reports[0].termReport[0].report)
+    //console.log(ans.reports[0].termReport[0].report)
     return ans;
 }
 

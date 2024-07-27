@@ -32,22 +32,26 @@ const StudentTable = () => {
             <table style={styles.table}>
                 <thead>
                     <tr>
-                        {['ID', 'Name', 'Year', 'Section'].map((header) => (
+                        {['ID', 'Name', 'Year', 'Section', 'Actions'].map((header) => (
                             <th style={styles.th} key={header}>{header}</th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
                     {
-                    
-                    Object.keys(studentDetails).map((index) => (
-                        <tr key={studentDetails[index].regNo} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
-                            <td style={styles.td}>{studentDetails[index].regNo}</td>
-                            <td style={styles.td}>{studentDetails[index].name}</td>
-                            <td style={styles.td}>{studentDetails[index].currYear}</td>
-                            <td style={styles.td}>{studentDetails[index].currSection}</td>
-                        </tr>
-                    ))}
+
+                        Object.keys(studentDetails).map((index) => (
+                            <tr key={studentDetails[index].regNo} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
+                                <td style={styles.td}>{studentDetails[index].regNo}</td>
+                                <td style={styles.td}>{studentDetails[index].name}</td>
+                                <td style={styles.td}>{studentDetails[index].currYear}</td>
+                                <td style={styles.td}>{studentDetails[index].currSection}</td>
+                                <td style={styles.td1} colSpan={2}>
+                                    <button style={styles.button}>view History</button>
+                                    {/* <button style={styles.button}>view Details</button> */}
+                                </td>
+                            </tr>
+                        ))}
                 </tbody>
             </table>
         </div>
@@ -97,6 +101,15 @@ const styles = {
         fontSize: '14px',
         transition: 'background-color 0.3s'
     },
+    td: {
+        border: '1px solid #ddd',
+        padding: '12px',
+        textAlign: 'left',
+        color: '#555',
+        fontSize: '14px',
+        transition: 'background-color 0.3s'
+
+    },
     evenRow: {
         backgroundColor: '#f9f9f9',
         transition: 'background-color 0.3s',
@@ -110,7 +123,17 @@ const styles = {
         ':hover': {
             backgroundColor: '#e9ecef'
         }
-    }
+    },
+    button: {
+        padding: '8px 12px',
+        border: 'none',
+        backgroundColor: '#0066cc',
+        color: '#fff',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s',
+        // marginLeft: '5pt'
+    },
 };
 
 export default StudentTable;

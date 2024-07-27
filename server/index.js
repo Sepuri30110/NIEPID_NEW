@@ -20,7 +20,6 @@ mongoose.connect("mongodb://127.0.0.1/niepid")
     .then((res) => {console.log("connected successfully")})
 .catch ((err) => {console.log(err)})
 
-
             app.use(express.json())
             app.use(express.urlencoded({ extended: true }))
 

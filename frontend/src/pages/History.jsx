@@ -80,9 +80,10 @@ const StudentPerformance = () => {
     const navigate = useNavigate()
     const id = localStorage.getItem("studentId")
     const role = localStorage.getItem("role")
+    console.log(role);
     useEffect(async () => {
         if (role === "teacher") {
-            axios.get("http://localhost:4000/teacher/history", {
+            axios.get("http://localhost:4000/teacher/hist", {
                 headers: {
                     id: id,
                     "Content-Type": "application/json",
@@ -97,11 +98,12 @@ const StudentPerformance = () => {
                     });
                     navigate('/teacher')
                 }
+                console.log(res)
                 setStudentInfo(res.data)
                 
             })
             .catch(err => {
-                //console.log(err.response)
+                console.log(err.response)
             })
         } 
         else if (role === "principle") {

@@ -69,7 +69,7 @@ const ViewStudents = () => {
             setFilteredStudents(response.data.data);
             setLoading(false);
         } catch (error) {
-            console.error(error);
+            console.error(error.response);
             setError('Error fetching student details. Please try again later.');
             setLoading(false);
         }

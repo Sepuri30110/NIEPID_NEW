@@ -31,6 +31,7 @@ const SearchInput = ({ name, value, onChange }) => {
 const PrincipalViewStudents = () => {
     const navigate = useNavigate();
     const [studentDetails, setStudentDetails] = useState([]);
+    const [filteredStudents, setFilteredStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [teacherDetails, setTeacherDetails] = useState({});
@@ -52,22 +53,20 @@ const PrincipalViewStudents = () => {
 
     useEffect(() => {
         fetchStudentDetails();
-    }, [searchValues]);
+    }, []);
 
     const fetchStudentDetails = async () => {
         setLoading(true);
         try {
-            //console.log(searchValues)
-            const { regno, name, curryear, currterm, classid } = searchValues;
-            const response = await axios.get('http://localhost:4000/principle/student/search', {
+            const response = await axios.get('http://localhost:4000/principle/student', {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem("token")}`
-                },
-                params: { regno, name, curryear, currterm, classid }
+                }
             });
 
             setStudentDetails(response.data.data);
+            setFilteredStudents(response.data.data);
             setLoading(false);
         } catch (error) {
             console.error(error);
@@ -98,8 +97,34 @@ const PrincipalViewStudents = () => {
         });
     }, [studentDetails]);
 
+    useEffect(() => {
+        filterStudents();
+    }, [searchValues]);
+
+    const filterStudents = () => {
+        let filtered = studentDetails;
+
+        Object.keys(searchValues).forEach(key => {
+            if (searchValues[key]) {
+
+                filtered = filtered.filter(student =>
+                    student[key] && student[key].toString().toLowerCase().includes(searchValues[key].toLowerCase())
+                );
+            }
+        });
+
+        setFilteredStudents(filtered);
+    };
+
     const toggleSearch = (column) => {
-        setShowSearch(prevState => ({ ...prevState, [column]: !prevState[column] }));
+
+        setShowSearch(prevState => {
+            let newShowSearch = { ...prevState };
+            Object.keys(newShowSearch).forEach(key => {
+                newShowSearch[key] = key === column ? !prevState[column] : false;
+            });
+            return newShowSearch;
+        });
     };
 
     const handleSearchChange = (e) => {
@@ -108,8 +133,14 @@ const PrincipalViewStudents = () => {
     };
 
     const showHistory = (studentId) => {
-        navigate('/principle/viewstudents/history/${studentId}');
+        localStorage.setItem("studentId",studentId)
+        navigate(`/principle/viewstudents/history/${studentId}`);
     };
+
+    const showDetails=(studentId)=>{
+        localStorage.setItem("studentId",studentId)
+        navigate(`/principle/viewstudents/details/${studentId}`);
+    }
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -120,7 +151,7 @@ const PrincipalViewStudents = () => {
             <table style={styles.table}>
                 <thead>
                     <tr>
-                        {['RegNo', 'Name', 'CurrYear', 'CurrTerm', 'Class ID', 'Allotted Teacher', 'Actions'].map((header, index) => (
+                        {['regNo', 'name', 'currYear', 'currTerm', 'classId'].map((header, index) => (
                             <th style={styles.th} key={header}>
                                 <div style={styles.thContent}>
                                     <span>{header}</span>
@@ -128,23 +159,33 @@ const PrincipalViewStudents = () => {
                                         <FontAwesomeIcon
                                             style={styles.icon}
                                             icon={faSearch}
-                                            onClick={() => toggleSearch(header.toLowerCase().replace(' ', ''))}
+                                            onClick={() => toggleSearch(header.replace(' ', ''))}
                                         />
                                     )}
                                 </div>
-                                {header !== 'Actions' && showSearch[header.toLowerCase().replace(' ', '')] && (
+                                {header !== 'Actions' && showSearch[header.replace(' ', '')] && (
                                     <SearchInput
-                                        name={header.toLowerCase().replace(' ', '')}
-                                        value={searchValues[header.toLowerCase().replace(' ', '')]}
+                                        name={header.replace(' ', '')}
+                                        value={searchValues[header.replace(' ', '')]}
                                         onChange={handleSearchChange}
                                     />
                                 )}
                             </th>
                         ))}
+                        <th style={styles.th}>
+                            <div style={styles.thContent}>
+                                <span>Allocated Teacher</span>
+                            </div>
+                        </th>
+                        <th style={styles.th}>
+                            <div style={styles.thContent}>
+                                <span>Actions</span>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {studentDetails.map((student, index) => (
+                    {filteredStudents.map((student, index) => (
                         <tr key={student._id} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
                             <td style={styles.td}>{student.regNo}</td>
                             <td style={styles.td}>{student.name}</td>
@@ -155,9 +196,14 @@ const PrincipalViewStudents = () => {
                                 {teacherDetails[student.classId] ? teacherDetails[student.classId] : 'Loading...'}
                             </td>
                             <td style={styles.td}>
-                                <button style={styles.button} onClick={() => showHistory(student._id)}>
-                                    Show History
-                                </button>
+                                <div style={styles.div}>
+                                    <button style={styles.button} onClick={() => showHistory(student.regNo)}>
+                                        Show History
+                                    </button>
+                                    <button style={styles.button} onClick={() => showDetails(student.regNo)}>
+                                        Show Details
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
@@ -168,6 +214,9 @@ const PrincipalViewStudents = () => {
 };
 
 const styles = {
+    div:{
+        display:'flex',
+    },
     container: {
         padding: '20px',
         margin: '20px auto',
@@ -235,6 +284,7 @@ const styles = {
         borderRadius: '4px',
         cursor: 'pointer',
         transition: 'background-color 0.3s',
+        margin:'5px'
     },
     buttonHover: {
         backgroundColor: '#005bb5'

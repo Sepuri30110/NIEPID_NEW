@@ -15,7 +15,8 @@ const { verifyToken, isAdmin, isStudent, isTeacher, isPrinciple } = require('./m
 
 //mongDB connection
 const mongoose = require('mongoose')
-mongoose.connect("mongodb+srv://newgenniepid:niepidnewgen@niepid.uslqnto.mongodb.net/niepid")
+// mongoose.connect("mongodb+srv://newgenniepid:niepidnewgen@niepid.uslqnto.mongodb.net/niepid")
+mongoose.connect("mongodb://127.0.0.1/niepid")
     .then((res) => {console.log("connected successfully")})
 .catch ((err) => {console.log(err)})
 

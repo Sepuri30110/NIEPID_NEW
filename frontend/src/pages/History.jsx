@@ -79,16 +79,18 @@ const Footer = () => (
 const StudentPerformance = () => {
     const navigate = useNavigate()
     const id = localStorage.getItem("studentId")
+    const role = localStorage.getItem("role")
     useEffect(async () => {
-        axios.get("http://localhost:4000/teacher/history", {
-            headers: {
-                id: id,
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-        })
+        if (role === "teacher") {
+            axios.get("http://localhost:4000/teacher/history", {
+                headers: {
+                    id: id,
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
             .then(res => {
-                //console.log(res)
+                // console.log(res)
                 if (res.status != 200) {
                     toast.error("Student is still in 1st Year", {
                         position: "top-right",
@@ -96,11 +98,59 @@ const StudentPerformance = () => {
                     navigate('/teacher')
                 }
                 setStudentInfo(res.data)
-
+                
             })
             .catch(err => {
                 //console.log(err.response)
             })
+        } 
+        else if (role === "principle") {
+            // console.log(role)
+            axios.get("http://localhost:4000/principle/hist", {
+                headers: {
+                    id: id,
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+                .then(res => {
+                    // console.log(res)
+                    if (res.status != 200) {
+                        toast.error("Student is still in 1st Year", {
+                            position: "top-right",
+                        });
+                        navigate('/principle/viewStudents')
+                    }
+                    setStudentInfo(res.data)
+
+                })
+                .catch(err => {
+                    console.log(err.response)
+                })
+        } 
+        else if (role === "admin") {
+            axios.get("http://localhost:4000/admin/hist", {
+                headers: {
+                    id: id,
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+                .then(res => {
+                    // console.log(res)
+                    if (res.status != 200) {
+                        toast.error("Student is still in 1st Year", {
+                            position: "top-right",
+                        });
+                        navigate('/admin/viewStudents')
+                    }
+                    setStudentInfo(res.data)
+
+                })
+                .catch(err => {
+                    //console.log(err.response)
+                })
+        }
     }, [])
 
     const [studentInfo, setStudentInfo] = useState({

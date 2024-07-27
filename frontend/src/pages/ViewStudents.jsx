@@ -1,57 +1,212 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
 
-// Sample data
-const stu = [
-    { id: 1, name: 's1', year: '2nd', section: 'A' },
-    { id: 2, name: 's2', year: '3rd', section: 'B' },
-    { id: 3, name: 's3', year: '1st', section: 'C' },
-];
+// Add the icons to the library
+library.add(faSearch);
 
-const StudentTable = () => {
-    const [studentDetails, setStudentDetails] = useState({})
+const SearchInput = ({ name, value, onChange }) => {
+    const inputRef = useRef(null);
 
-    useEffect(async () => {
-        const data = await axios.get('http://localhost:4000/admin/viewStudent', {
-            headers: {
-                'Content-Type': 'application/json',
-                authorization: `Bearer ${localStorage.getItem("token")}`
+    useEffect(() => {
+        inputRef.current.focus();
+    }, []);
+
+    return (
+        <input
+            type="text"
+            ref={inputRef}
+            name={name}
+            value={value || ''}
+            onChange={onChange}
+            placeholder={`Search ${name}`}
+            style={styles.searchInput}
+        />
+    );
+};
+
+const ViewStudents = () => {
+    const navigate = useNavigate();
+    const [studentDetails, setStudentDetails] = useState([]);
+    const [filteredStudents, setFilteredStudents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [teacherDetails, setTeacherDetails] = useState({});
+    const [showSearch, setShowSearch] = useState({
+        regNo: false,
+        name: false,
+        currYear: false,
+        currTerm: false,
+        classId: false,
+    });
+
+    const [searchValues, setSearchValues] = useState({
+        regno: '',
+        name: '',
+        curryear: '',
+        currterm: '',
+        classid: '',
+    });
+
+    useEffect(() => {
+        fetchStudentDetails();
+    }, []);
+
+    const fetchStudentDetails = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:4000/admin/student', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+
+            setStudentDetails(response.data.data);
+            setFilteredStudents(response.data.data);
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+            setError('Error fetching student details. Please try again later.');
+            setLoading(false);
+        }
+    };
+
+    const fetchTeacherDetails = async (classId) => {
+        try {
+            const response = await axios.get(`http://localhost:4000/admin/teacher/${classId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+            });
+            setTeacherDetails(prevState => ({ ...prevState, [classId]: response.data.teacher }));
+        } catch (error) {
+            console.error('Error fetching teacher details:', error.response);
+        }
+    };
+
+    useEffect(() => {
+        studentDetails.forEach(student => {
+            if (student.classId && !teacherDetails[student.classId]) {
+                fetchTeacherDetails(student.classId);
             }
-        })
-            .then(res => {
-                console.log(res.data.data)
-                setStudentDetails(res.data.data)
-            })
-            .catch(err => {
-                console.log(err.response)
-            })
-    }, [])
+        });
+    }, [studentDetails]);
+
+    useEffect(() => {
+        filterStudents();
+    }, [searchValues]);
+
+    const filterStudents = () => {
+        let filtered = studentDetails;
+
+        Object.keys(searchValues).forEach(key => {
+            if (searchValues[key]) {
+
+                filtered = filtered.filter(student =>
+                    student[key] && student[key].toString().toLowerCase().includes(searchValues[key].toLowerCase())
+                );
+            }
+        });
+
+        setFilteredStudents(filtered);
+    };
+
+    const toggleSearch = (column) => {
+
+        setShowSearch(prevState => {
+            let newShowSearch = { ...prevState };
+            Object.keys(newShowSearch).forEach(key => {
+                newShowSearch[key] = key === column ? !prevState[column] : false;
+            });
+            return newShowSearch;
+        });
+    };
+
+    const handleSearchChange = (e) => {
+        const { name, value } = e.target;
+        setSearchValues(searchValues => ({ ...searchValues, [name]: value }));
+    };
+
+    const showHistory = (studentId) => {
+        localStorage.setItem("studentId",studentId)
+        navigate(`/admin/viewstudents/history/${studentId}`);
+    };
+
+    const showDetails=(studentId)=>{
+        localStorage.setItem("studentId",studentId)
+        navigate(`/admin/viewstudents/details/${studentId}`);
+    }
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+
     return (
         <div style={styles.container}>
             <h1 style={styles.heading}>Student Details</h1>
             <table style={styles.table}>
                 <thead>
                     <tr>
-                        {['ID', 'Name', 'Year', 'Section', 'Actions'].map((header) => (
-                            <th style={styles.th} key={header}>{header}</th>
+                        {['regNo', 'name', 'currYear', 'currTerm', 'classId'].map((header, index) => (
+                            <th style={styles.th} key={header}>
+                                <div style={styles.thContent}>
+                                    <span>{header}</span>
+                                    {header !== 'Actions' && (
+                                        <FontAwesomeIcon
+                                            style={styles.icon}
+                                            icon={faSearch}
+                                            onClick={() => toggleSearch(header.replace(' ', ''))}
+                                        />
+                                    )}
+                                </div>
+                                {header !== 'Actions' && showSearch[header.replace(' ', '')] && (
+                                    <SearchInput
+                                        name={header.replace(' ', '')}
+                                        value={searchValues[header.replace(' ', '')]}
+                                        onChange={handleSearchChange}
+                                    />
+                                )}
+                            </th>
                         ))}
+                        <th style={styles.th}>
+                            <div style={styles.thContent}>
+                                <span>Allocated Teacher</span>
+                            </div>
+                        </th>
+                        <th style={styles.th}>
+                            <div style={styles.thContent}>
+                                <span>Actions</span>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {
-
-                        Object.keys(studentDetails).map((index) => (
-                            <tr key={studentDetails[index].regNo} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
-                                <td style={styles.td}>{studentDetails[index].regNo}</td>
-                                <td style={styles.td}>{studentDetails[index].name}</td>
-                                <td style={styles.td}>{studentDetails[index].currYear}</td>
-                                <td style={styles.td}>{studentDetails[index].currSection}</td>
-                                <td style={styles.td1} colSpan={2}>
-                                    <button style={styles.button}>view History</button>
-                                    {/* <button style={styles.button}>view Details</button> */}
-                                </td>
-                            </tr>
-                        ))}
+                    {filteredStudents.map((student, index) => (
+                        <tr key={student._id} style={index % 2 === 0 ? styles.evenRow : styles.oddRow}>
+                            <td style={styles.td}>{student.regNo}</td>
+                            <td style={styles.td}>{student.name}</td>
+                            <td style={styles.td}>{student.currYear}</td>
+                            <td style={styles.td}>{student.currTerm}</td>
+                            <td style={styles.td}>{student.classId}</td>
+                            <td style={styles.td}>
+                                {teacherDetails[student.classId] ? teacherDetails[student.classId] : 'Loading...'}
+                            </td>
+                            <td style={styles.td}>
+                                <div style={styles.div}>
+                                    <button style={styles.button} onClick={() => showHistory(student.regNo)}>
+                                        Show History
+                                    </button>
+                                    <button style={styles.button} onClick={() => showDetails(student.regNo)}>
+                                        Show Details
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>
@@ -59,6 +214,9 @@ const StudentTable = () => {
 };
 
 const styles = {
+    div:{
+        display:'flex',
+    },
     container: {
         padding: '20px',
         margin: '20px auto',
@@ -68,6 +226,15 @@ const styles = {
         borderRadius: '10px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    },
+    icon: {
+        marginLeft: '8px',
+        cursor: 'pointer'
+    },
+    thContent: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
     heading: {
         fontSize: '28px',
@@ -91,24 +258,36 @@ const styles = {
         fontSize: '16px',
         position: 'sticky',
         top: '0',
-        zIndex: '1'
+        zIndex: '1',
+    },
+    searchInput: {
+        width: '100%',
+        padding: '8px',
+        margin: '5px 0',
+        border: '1px solid #ddd',
+        borderRadius: '4px',
+        boxSizing: 'border-box'
     },
     td: {
         border: '1px solid #ddd',
         padding: '12px',
-        textAlign: 'left',
+        textAlign: 'center',
         color: '#555',
         fontSize: '14px',
         transition: 'background-color 0.3s'
     },
-    td: {
-        border: '1px solid #ddd',
-        padding: '12px',
-        textAlign: 'left',
-        color: '#555',
-        fontSize: '14px',
-        transition: 'background-color 0.3s'
-
+    button: {
+        padding: '8px 12px',
+        border: 'none',
+        backgroundColor: '#0066cc',
+        color: '#fff',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s',
+        margin:'5px'
+    },
+    buttonHover: {
+        backgroundColor: '#005bb5'
     },
     evenRow: {
         backgroundColor: '#f9f9f9',
@@ -123,17 +302,7 @@ const styles = {
         ':hover': {
             backgroundColor: '#e9ecef'
         }
-    },
-    button: {
-        padding: '8px 12px',
-        border: 'none',
-        backgroundColor: '#0066cc',
-        color: '#fff',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s',
-        // marginLeft: '5pt'
-    },
+    }
 };
 
-export default StudentTable;
+export default ViewStudents;
